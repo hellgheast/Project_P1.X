@@ -299,6 +299,12 @@ int main(int argc, char** argv)
            
 
             #ifdef DEBUG
+            case 239:
+            {
+                ListInit();
+                break;
+            }
+
             case 240:
             {
                 var.adress = 0x300;
@@ -306,6 +312,7 @@ int main(int argc, char** argv)
                 sscanf(function,"%s %s",user,password);
                 //Ecriture du compte en mémoire
                 AddUser(user,password);
+                break;
             }
             
             case 241:
@@ -315,6 +322,7 @@ int main(int argc, char** argv)
                 sscanf(function,"%s %s",user,password);
                 //Ecriture du compte en mémoire
                 DeleteUser(user,password);
+                break;
             }
 
             case 251:
@@ -349,6 +357,7 @@ int main(int argc, char** argv)
                 READ_cmd_n(var.nb,begin_log.nb,4);
                 sprintf (buffer,"Valeur lue : %d\n",begin_log.adress);
                 putsU3(buffer);
+                break;
             }
 
             #endif

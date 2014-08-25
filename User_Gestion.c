@@ -75,14 +75,14 @@ void Read_log_adress (void)
     sprintf(buffer,"ADRESSE : %x BEGIN : %x\n",var.adress,begin_log.adress);
     putsU3(buffer);
 
-    var.adress = 0x018;
+    var.adress = 0x020;
     READ_cmd_n(var.nb,actual_log.nb,4);
 
     sprintf(buffer,"ADRESSE : %x ACTUAL : %x\n",var.adress,actual_log.adress);
     putsU3(buffer);
 
 
-    var.adress = 0x030;
+    var.adress = 0x040;
     READ_cmd_n(var.nb,end_log.nb,4);
 
     sprintf(buffer,"END : %x BEGIN : %x\n",var.adress,begin_log.adress);
@@ -98,10 +98,10 @@ void Write_log_addres (void)
     var.adress = 0x000;
     WRITE_cmd_n(var.nb,begin_log.nb,4);
 
-    var.adress = 0x018;
+    var.adress = 0x020;
     WRITE_cmd_n(var.nb,actual_log.nb,4);
 
-    var.adress = 0x030;
+    var.adress = 0x040;
     WRITE_cmd_n(var.nb,end_log.nb,4);
 }
 
@@ -112,39 +112,29 @@ int  AddUser    (char* user,char* password)
 
     Read_log_adress();
 
+    //Vérification de la longeur des chaînes de caractères transmises.
     if(strlen(user)+1>9 || strlen(password)+1 >9)
     {
         return -1;
     }
-    
 
 
-#ifdef DEBUG
-            WRITE_cmd_n(begin_log.nb,user,strlen(user)+1);
-            end_log.adress +=strlen(user)+1;
-            sprintf(buffer,"User %s ADDED\n",user);
-            putsU3(buffer);
-            sprintf(buffer,"END ADRESS : %x\n",end_log.adress);
-            putsU3(buffer);
-            Write_log_addres();
-#endif
-
-#if  PROD
-    for(actual_log.adress.data = begin_log.adress.data;actual_log.adress.data!=0x360;actual_log.adress.data += actual_log.adress.data )
+    //Lecture dans la liste
+    for(actual_log.adress = begin_log.adress;actual_log.adress!=0x360;actual_log.adress += 18 )
     {
         READ_string(actual_log.nb,buffer,32);
         if(strcmp(buffer,"********")==0)
         {
             WRITE_cmd_n(actual_log.nb,user,strlen(user)+1);
-            actual_log.adress.data +=strlen(user)+1;
+            actual_log.adress +=strlen(user)+1;
             WRITE_cmd_n(actual_log.nb,password,strlen(password)+1);
-            actual_log.adress.data +=strlen(password)+1;
+            actual_log.adress+=strlen(password)+1;
+            Write_log_addres();
             break;
         }
     }
-#endif
 
-
+    //On indique que le nombre d'utilisateur maximum à été atteint.
     if (actual_log.adress == 0x360)
     {
         putsU3("Nombre maximum d'utilisateurs atteints\n");
@@ -250,3 +240,28 @@ void ModifiyPassWord (char* user,char* new_password)
     
 }
 
+void ListInit (void)
+{
+    union myadress temp_adress;
+    char buffer [9] = "********";
+
+    //Fonction pour initialiser la liste a vide
+    temp_adress.adress = 0x300;
+    WRITE_cmd_n(temp_adress.nb,buffer,9);
+
+    temp_adress.adress +=9;
+    WRITE_cmd_n(temp_adress.nb,buffer,9);
+
+    temp_adress.adress += 9;
+    WRITE_cmd_n(temp_adress.nb,buffer,9);
+
+    temp_adress.adress +=9;
+    WRITE_cmd_n(temp_adress.nb,buffer,9);
+
+    temp_adress.adress +=9;
+    WRITE_cmd_n(temp_adress.nb,buffer,9);
+
+    temp_adress.adress += 9;
+    WRITE_cmd_n(temp_adress.nb,buffer,9);
+
+}

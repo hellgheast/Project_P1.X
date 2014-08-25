@@ -8,7 +8,7 @@ Version      : 2.05
 ---------------------------------------------------------------------
 Description  : Librairie de fonctionnement de gestion des utilisateurs
 --------------------------Modifications------------------------------
-Version      : 1.0
+Version      : 1.2
 Modification : Version_initiale
 *********************************************************************/
 
@@ -31,9 +31,10 @@ void Read_log_adress (void);
 void Init_user_gestion (void);
 void Write_log_addres (void);
 
+//Fonction d'initialisation de la liste
+void ListInit (void);
 
 
-//
 
 #endif	/* USER_GESTION_H */
 
