@@ -6,21 +6,16 @@ Compilateur  : MPLAB X
 Date         : 25. août 2014
 Version      : 2.05
 ---------------------------------------------------------------------
-Description  : Librairie de fonctionnement du détecteur de mouvement AMN1111
+Description  : Librairie de fonctionnement pour la gestion du chauffage.
 --------------------------Modifications------------------------------
 Version      : 1.0
 Modification : Version Initiale
 *********************************************************************/
 
-
-#ifndef AMN1111_H
-#define	AMN1111_H
-
-//Prototype
-
-//Fonctions
+#ifndef PWM_H
+#define	PWM_H
 
 
 
-#endif	/* AMN1111_H */
+#endif	/* PWM_H */
 
