@@ -288,7 +288,7 @@ int main(int argc, char** argv)
             }
 
 
-            case 250:
+            case 230:
             {
               SetCommandMode();
               Disconnect();
@@ -299,7 +299,25 @@ int main(int argc, char** argv)
            
 
             #ifdef DEBUG
-             case 251:
+            case 240:
+            {
+                var.adress = 0x300;
+                //test du rajout d'utilisateur
+                sscanf(function,"%s %s",user,password);
+                //Ecriture du compte en mémoire
+                AddUser(user,password);
+            }
+            
+            case 241:
+            {
+                var.adress = 0x300;
+                //test du rajout d'utilisateur
+                sscanf(function,"%s %s",user,password);
+                //Ecriture du compte en mémoire
+                DeleteUser(user,password);
+            }
+
+            case 251:
             {
                 var.adress = 0;
                 sscanf(function,"%d",&begin_log.adress);

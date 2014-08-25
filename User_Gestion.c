@@ -109,7 +109,7 @@ void Write_log_addres (void)
 int  AddUser    (char* user,char* password)
 {
     char buffer [32];
-    char address [3]={0x00,0x03,0x00};
+
     Read_log_adress();
 
     if(strlen(user)+1>9 || strlen(password)+1 >9)
@@ -120,13 +120,13 @@ int  AddUser    (char* user,char* password)
 
 
 #ifdef DEBUG
-            WRITE_cmd_n(address,user,strlen(user)+1);
+            WRITE_cmd_n(begin_log.nb,user,strlen(user)+1);
             end_log.adress +=strlen(user)+1;
             sprintf(buffer,"User %s ADDED\n",user);
             putsU3(buffer);
             sprintf(buffer,"END ADRESS : %x\n",end_log.adress);
             putsU3(buffer);
-
+            Write_log_addres();
 #endif
 
 #if  PROD
