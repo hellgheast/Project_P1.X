@@ -321,7 +321,7 @@ int main(int argc, char** argv)
                 //test du rajout d'utilisateur
                 sscanf(function,"%s %s",user,password);
                 //Ecriture du compte en mémoire
-                DeleteUser(user,password);
+                DeleteUser(user);
                 break;
             }
 
