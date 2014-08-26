@@ -299,6 +299,12 @@ int main(int argc, char** argv)
            
 
             #ifdef DEBUG
+            case 27:
+            {
+                WREN_cmd();
+                break;
+            }
+
             case 239:
             {
                 ListInit();

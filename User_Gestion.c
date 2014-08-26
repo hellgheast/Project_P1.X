@@ -249,7 +249,7 @@ void ListInit (void)
     temp_adress.adress = 0x300;
     WRITE_cmd_n(temp_adress.nb,buffer,9);
 
-    temp_adress.adress +=9;
+    temp_adress.adress =0x309;
     WRITE_cmd_n(temp_adress.nb,buffer,9);
 
     temp_adress.adress += 9;

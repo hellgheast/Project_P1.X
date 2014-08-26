@@ -17,13 +17,8 @@ Modification : Version Initiale
 #define	AMN1111_H
 
 //Prototype
-void try_function (void);
 
 //Fonctions
-void try_function (void)
-{
-    putsU3("Test");
-}
 
 
 #endif	/* AMN1111_H */

@@ -24,17 +24,6 @@
 #define TAILLE_MIN 1
 
 /*Commande EEPROM*/
-#define READ  0b00000011  //3
-#define WRITE 0b00000010  //2
-#define WREN  0b00000110  //6
-#define WRDI  0b00000100  //4
-#define RDSR  0b00000101  //5
-#define WRSR  0b00000001  //1
-#define PE    0b01000010  //
-#define SE    0b11011000  //
-#define CE    0b11000111  //
-#define RDID  0b10101011  //
-#define DPD   0b10111001  //
 
 #define CHANNEL_SPI 3
 
