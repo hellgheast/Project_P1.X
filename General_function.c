@@ -9,3 +9,19 @@ void DelayMs(unsigned int msec)
 
 }
 
+int  ConvertLittletoBig(int var)
+{
+  union myadress temp;
+  char temp_char;
+  temp.adress = var;
+
+  temp_char = temp.nb[0];
+  temp.nb[0] = temp.nb[3];
+  temp.nb[3] = temp_char;
+
+  temp_char  = temp.nb[2];
+  temp.nb[2] = temp.nb[1];
+  temp.nb[1] = temp_char;
+
+  return temp.adress;
+}

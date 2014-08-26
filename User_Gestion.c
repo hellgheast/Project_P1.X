@@ -1,6 +1,7 @@
 #include "User_Gestion.h"
 #include "General_func.h"
 
+
 //Variables locales
 extern union myadress begin_log;
 extern union myadress actual_log;
@@ -12,6 +13,7 @@ union myadress var;
 #define actual_tab   &actual_log.nb[1]
 #define end_tab      &end_log.nb[1]
 #define var_tab      &var.nb[1]
+
 
 //Fichier source
 void Init_user_gestion (void)
@@ -243,25 +245,48 @@ void ModifiyPassWord (char* user,char* new_password)
 void ListInit (void)
 {
     union myadress temp_adress;
-    char buffer [9] = "********";
+    int address_value = 0x300;
+    unsigned char debug_buffer [64];
+    unsigned char buffer [9] = "********";
 
     //Fonction pour initialiser la liste a vide
-    temp_adress.adress = 0x300;
-    WRITE_cmd_n(temp_adress.nb,buffer,9);
+    temp_adress.adress = ConvertLittletoBig(address_value);
+    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
+    putsU3(debug_buffer);
+    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
 
-    temp_adress.adress =0x309;
-    WRITE_cmd_n(temp_adress.nb,buffer,9);
+    address_value += 9;
+    temp_adress.adress = ConvertLittletoBig(address_value);
+    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
+    putsU3(debug_buffer);
+    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
 
-    temp_adress.adress += 9;
-    WRITE_cmd_n(temp_adress.nb,buffer,9);
+    address_value += 9;
+    temp_adress.adress = ConvertLittletoBig(address_value);
+    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
+    putsU3(debug_buffer);
+    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
 
-    temp_adress.adress +=9;
-    WRITE_cmd_n(temp_adress.nb,buffer,9);
+    address_value += 9;
+    temp_adress.adress = ConvertLittletoBig(address_value);
+    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
+    putsU3(debug_buffer);
+    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
 
-    temp_adress.adress +=9;
-    WRITE_cmd_n(temp_adress.nb,buffer,9);
+    address_value += 9;
+    temp_adress.adress = ConvertLittletoBig(address_value);
+    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
+    putsU3(debug_buffer);
+    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
 
-    temp_adress.adress += 9;
-    WRITE_cmd_n(temp_adress.nb,buffer,9);
+    address_value += 9;
+    temp_adress.adress = ConvertLittletoBig(address_value);
+    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
+    putsU3(debug_buffer);
+    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
+
+    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
+    putsU3(debug_buffer);
+
 
 }

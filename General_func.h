@@ -33,7 +33,7 @@ Modification : Ajout
 void DelayMs(unsigned int msec);
 void InitADC (void);
 void InitMemory (void);
-
+int  ConvertLittletoBig(int var);
 
 
 
@@ -57,8 +57,8 @@ union myfloat
 
 union myadress
 {
-    int adress;
-    char nb[4];
+    unsigned int adress;
+    unsigned char nb[4];
 };
 
 
