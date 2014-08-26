@@ -150,11 +150,7 @@ void  HidePin(void);
 int Disconnect(void);
 
 
-//Fonction de commande des GPIO
-
-
-//Fonctions
-
+//Ceci c'est Simon qui code
 
 
 #endif	/* BLUETOOTH_MODULE_H */
