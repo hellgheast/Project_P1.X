@@ -33,6 +33,7 @@
         <itemPath>RTCC.h</itemPath>
         <itemPath>TL2350R.h</itemPath>
       </logicalFolder>
+      <itemPath>Gestion_Chauffage.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
