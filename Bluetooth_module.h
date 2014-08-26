@@ -150,9 +150,5 @@ void  HidePin(void);
 int Disconnect(void);
 
 
-//Ceci c'est Simon qui code
-// C'est Isma qui teste
-
-
 #endif	/* BLUETOOTH_MODULE_H */
 
