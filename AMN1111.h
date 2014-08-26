@@ -24,7 +24,6 @@ void try_function (void)
 {
     putsU3("Test");
 }
-//OUaaaaaarggggggggg
 
 
 #endif	/* AMN1111_H */
