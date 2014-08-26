@@ -39,4 +39,8 @@ Icon
 *.o
 *.map
 *.elf
+*.xml
+*.hex
+*.mk
+*.properties
 nbproject
