@@ -44,4 +44,6 @@ Icon
 *.hex
 *.mk
 *.proprerties
+*.bash
+*.d
 nbproject
