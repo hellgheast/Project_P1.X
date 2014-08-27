@@ -35,7 +35,7 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 //Definitions
 #define UART
 #define BUFFER_SIZE 128
-#define DEBUG
+#undef DEBUG
 
 
 //Prototypes de fonctions
@@ -170,42 +170,46 @@ int main(int argc, char** argv)
            
       if (done == 1)
       {
-        //sscanf(buffer,"%s %d %s %s",user,&CMD,password,function);
-        //sprintf(buffer,"USER : %s CMD: %d PWD : %s PARAM: %s",user,CMD,password,function);
+        //sscanf(buffer,"%s,%s,%d,%s",user,password,&CMD,function);
+        //
 
-       
-        sprintf(buffer,"CMD: %d PARAM: %s\n",CMD,function);
-        putsU3(buffer);
-      
+      #ifdef DEBUG
+          sprintf(buffer,"CMD : %d PARAM : %s",CMD,function);
+      #endif
       }
         
 
     if(done==1){
-        putsU3("IN swictch case");
         switch (CMD)
         {
             case 0:
+            {
+                putsU3("LOGIN OK");
+                break;
+            }
+
+            case 1:
             {
               LED4 = 1;
               putsU3("La led 4 est allumée\n\r");
               break;
             }
 
-            case 1:
+            case 2:
             {
               LED4 = 0;
               putsU3("La led 4 est éteinte\n\r");
               break;
             }
 
-            case 2:
+            case 3:
             {
               LED5 = 1;
               putsU3("La led 5 est allumée\n\r");
               break;
             }
 
-            case 3:
+            case 4:
             {
               LED5 = 0;
               putsU3("La led 5 est éteinte\n\r");
@@ -333,8 +337,9 @@ int main(int argc, char** argv)
 
             case 251:
             {
+                //
                 var.adress = 0;
-                sscanf(function,"%d",&begin_log.adress);
+                sscanf(function,"%d,%d",&begin_log.adress);
                 WRITE_cmd_n(var.nb,begin_log.nb,4);
                 sprintf(buffer,"%x\n",begin_log.adress);
                 putsU3(buffer);
@@ -360,7 +365,7 @@ int main(int argc, char** argv)
             case 254:
             {
                 sscanf(function,"%d",&var.adress);
-                READ_cmd_n(var.nb,begin_log.nb,4);
+                READ_cmd_n(&var.nb[1],&begin_log.nb[1],3);
                 sprintf (buffer,"Valeur lue : %d\n",begin_log.adress);
                 putsU3(buffer);
                 break;
@@ -441,7 +446,6 @@ void __ISR(_UART2_VECTOR, ipl2) IntUart2Handler(void)
 
             if(U2STAbits.FERR == 0 && U2STAbits.PERR == 0 )
             {
-              putU3('K');
               getsU3(buffer,128);   //On récupère le message
               cnt_debug++;          //La variable de débug s'incrémente
               done=1;               //On indique qu'une transmission c'est faite
@@ -449,9 +453,14 @@ void __ISR(_UART2_VECTOR, ipl2) IntUart2Handler(void)
 
             INTEnableInterrupts();  //On réactive les interrupts
             INTClearFlag(INT_SOURCE_UART_RX(UART3A)); // Clear the RX interrupt Flag
-            sscanf(buffer,"%d %s",&CMD,function);
 
+            #ifdef DEBUG
+              sscanf(buffer,"%d,%s",&CMD,function);
+            #endif
 
+            #ifndef DEBUG
+            sscanf(buffer,"%s,%s,%d,%s",user,password,&CMD,function);
+            #endif
 	}
 
 	// We don't care about TX interrupt
@@ -466,8 +475,7 @@ void WriteByte (void)
 {
 
   //Variables locales
-  int mon_adresse[3];
-  char mon_adresse_b[3];
+  union myadress mon_adresse;
   int data;
   unsigned char datac;
 
@@ -476,17 +484,12 @@ void WriteByte (void)
   done = 0;
 
 
-  sscanf(function,"%d,%d,%d,%d",&mon_adresse[0],&mon_adresse[1],&mon_adresse[2],&data);
-  sprintf(function,"mon adresse est %d,%d,%d et la donnée est %d\n",mon_adresse[0],mon_adresse[1],mon_adresse[2],data);
+  sscanf(function,"%d,%d",&mon_adresse.adress,&data);
+  sprintf(function,"mon adresse est %d, et la donnée est %d\n",mon_adresse.adress,data);
   putsU3(function);
 
-  /*Conversion d'un INT32 en char */
-  mon_adresse_b[0]=mon_adresse[0];
-  mon_adresse_b[1]=mon_adresse[1];
-  mon_adresse_b[2]=mon_adresse[2];
-
   datac = data;
-  WRITE_cmd(mon_adresse_b,datac);
+  WRITE_cmd(&mon_adresse.nb[1],datac);
 
   putsU3("WRITE END\n");
 }
@@ -495,26 +498,22 @@ void WriteByte (void)
 void ReadByte(void)
 {
      //Variables locales
-     int mon_adresse[3];
-     char mon_adresse_b[3];
+     union myadress mon_adresse;
      unsigned char datac;
 
     putsU3("READ MODE");
     done = 0;
 
-    sscanf(function,"%d,%d,%d",&mon_adresse[0],&mon_adresse[1],&mon_adresse[2]);
-    sprintf(function,"mon adresse est %d,%d,%d\n",mon_adresse[0],mon_adresse[1],mon_adresse[2]);
+    sscanf(function,"%d",&mon_adresse.adress);
+    sprintf(function,"mon adresse est %d\n",mon_adresse.adress);
     putsU3(function);
 
-    mon_adresse_b[0]=mon_adresse[0];
-    mon_adresse_b[1]=mon_adresse[1];
-    mon_adresse_b[2]=mon_adresse[2];
+    
+    datac = READ_cmd(&mon_adresse.nb[1]);
+    sprintf(function,"la donnée vaut %d\n",datac);
+    putsU3(function);
 
-   datac = READ_cmd(mon_adresse_b);
-   sprintf(function,"la donnée vaut %d\n",datac);
-   putsU3(function);
-
-   putsU3("READ END");
+    putsU3("READ END");
 
 }
 
@@ -522,25 +521,19 @@ void ReadByte(void)
 void FloatWrite(void)
 {
     //Variables locales
-    int mon_adresse[3];
-    char mon_adresse_b[3];
+    union myadress mon_adresse;
     union myfloat value;
     
 
     putsU3("WRITE FLOAT MODE");
     
     //Récupération de l'adresse ou on va écrire et du flottant
-    sscanf(function,"%d,%d,%d,%f",&mon_adresse[0],&mon_adresse[1],&mon_adresse[2],&value.f);
-    sprintf(function,"mon adresse est %d,%d,%d est la valeur est %f\n",mon_adresse[0],mon_adresse[1],mon_adresse[2],value.f);
+    sscanf(function,"%d,%f",&mon_adresse.adress,&value.f);
+    sprintf(function,"mon adresse est %d est la valeur est %f\n",mon_adresse.adress,value.f);
     putsU3(function);
 
-    //Conversion de l'adresse
-    mon_adresse_b[0]=mon_adresse[0];
-    mon_adresse_b[1]=mon_adresse[1];
-    mon_adresse_b[2]=mon_adresse[2];
-
     //Ecriture dans l'EEPROM du flottant
-    WRITE_cmd_n(mon_adresse_b,value.nb,sizeof(value.f));
+    WRITE_cmd_n(&mon_adresse.nb[1],value.nb,sizeof(value.f));
     putsU3("WRITE FLOAT END\n\r");
 }
 
@@ -548,24 +541,18 @@ void FloatWrite(void)
 void FloatRead (void)
 {
   //Variables locales
-  int mon_adresse[3];
-  char mon_adresse_b[3];
+  union myadress mon_adresse;
   union myfloat value;
 
   putsU3("READ FLOAT MODE");
 
   //Récupération de l'adresse ou on va lire
-  sscanf(function,"%d,%d,%d",&mon_adresse[0],&mon_adresse[1],&mon_adresse[2]);
-  sprintf(function,"mon adresse est %d,%d,%d\n",mon_adresse[0],mon_adresse[1],mon_adresse[2]);
+  sscanf(function,"%d",&mon_adresse.adress);
+  sprintf(function,"mon adresse est %d\n",mon_adresse.adress);
   putsU3(function);
 
-  //Conversion de l'adresse de int en char (de 4 octet à 1 octet)
-  mon_adresse_b[0]=mon_adresse[0];
-  mon_adresse_b[1]=mon_adresse[1];
-  mon_adresse_b[2]=mon_adresse[2];
-
   //Lecture dans l'EEPROM
-  READ_cmd_n(mon_adresse_b,value.nb,sizeof(value.f));
+  READ_cmd_n(&mon_adresse.nb[1],value.nb,sizeof(value.f));
 
   sprintf(function,"la donnée vaut %f\n",value.f);
   putsU3(function);
@@ -578,20 +565,14 @@ void FloatRead (void)
 void StringWrite(void)
 {
   //Variables locales
-  int mon_adresse[3];
-  char mon_adresse_b[3];
-
+  union myadress mon_adresse;
 
   putsU3("WRITE STRING MODE");
-  sscanf(function,"%d,%d,%d,%s",&mon_adresse[0],&mon_adresse[1],&mon_adresse[2],buffer_s);
-  sprintf(function,"mon adresse est %d,%d,%d et la chaine est : %s\n",mon_adresse[0],mon_adresse[1],mon_adresse[2],buffer_s);
+  sscanf(function,"%d,%s",&mon_adresse.adress,buffer_s);
+  sprintf(function,"mon adresse est %d,%d,%d et la chaine est : %s\n",mon_adresse.adress,buffer_s);
   putsU3(function);
 
-  mon_adresse_b[0]=mon_adresse[0];
-  mon_adresse_b[1]=mon_adresse[1];
-  mon_adresse_b[2]=mon_adresse[2];
-
-  WRITE_cmd_n(mon_adresse_b,buffer_s,strlen(buffer_s)+1);
+  WRITE_cmd_n(&mon_adresse.nb[1],buffer_s,strlen(buffer_s)+1);
   putsU3("WRITE STRING END\n\r");
 }
 
@@ -599,20 +580,14 @@ void StringWrite(void)
 void StringRead(void)
 {
   //Variables locales
-  int mon_adresse[3];
-  char mon_adresse_b[3];
- 
+    union myadress mon_adresse;
 
   putsU3("READ STRING MODE");
-  sscanf(function,"%d,%d,%d",&mon_adresse[0],&mon_adresse[1],&mon_adresse[2]);
-  sprintf(function,"mon adresse est %d,%d,%d\n",mon_adresse[0],mon_adresse[1],mon_adresse[2]);
+  sscanf(function,"%d",&mon_adresse.adress);
+  sprintf(function,"mon adresse est %d\n",mon_adresse.adress);
   putsU3(function);
 
-  mon_adresse_b[0]=mon_adresse[0];
-  mon_adresse_b[1]=mon_adresse[1];
-  mon_adresse_b[2]=mon_adresse[2];
-
-  READ_string(mon_adresse_b,buffer_s,BUFFER_SIZE);
+  READ_string(&mon_adresse.nb[1],buffer_s,BUFFER_SIZE);
   sprintf(buffer,"La chaîne est %s \n",buffer_s);
   putsU3(buffer);
   putsU3("READ STRING END\n\r");

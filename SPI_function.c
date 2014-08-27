@@ -163,9 +163,9 @@ void PE_cmd (unsigned char addr_tab[])
     WREN_cmd();
     CS = 0;
     writeSPI2(PE);
-    writeSPI2(addr_tab[0]);
-    writeSPI2(addr_tab[1]);
     writeSPI2(addr_tab[2]);
+    writeSPI2(addr_tab[1]);
+    writeSPI2(addr_tab[0]);
     CS = 1;
 }
 
@@ -174,9 +174,9 @@ void SE_cmd (unsigned char addr_tab[])
     WREN_cmd();
     CS = 0;
     writeSPI2(SE);
-    writeSPI2(addr_tab[0]);
-    writeSPI2(addr_tab[1]);
     writeSPI2(addr_tab[2]);
+    writeSPI2(addr_tab[1]);
+    writeSPI2(addr_tab[0]);
     CS = 1;
 }
 
@@ -198,14 +198,15 @@ void DPD_cmd()
 
 unsigned char RDID_cmd (unsigned char addr_tab[])
 {
-    char ID;
+    unsigned char ID;
     CS = 0;
     writeSPI2(RDID);
-    writeSPI2(addr_tab[0]);
-    writeSPI2(addr_tab[1]);
     writeSPI2(addr_tab[2]);
+    writeSPI2(addr_tab[1]);
+    writeSPI2(addr_tab[0]);
     ID = writeSPI2(0);
     CS = 1;
+    return ID;
 }
 
 
@@ -219,9 +220,9 @@ void WRITE_cmd(unsigned char addr_tab[],unsigned char byte)
     CS = 0;
     writeSPI2(WRITE);
     /*Envoi de l'adresse*/
-    writeSPI2(addr_tab[0]);
-    writeSPI2(addr_tab[1]);
     writeSPI2(addr_tab[2]);
+    writeSPI2(addr_tab[1]);
+    writeSPI2(addr_tab[0]);
     /*Envoi du byte*/
     writeSPI2(byte);
     CS = 1;
@@ -236,9 +237,9 @@ unsigned char READ_cmd (unsigned char addr_tab[])
     /*Envoi de la commande*/
     writeSPI2(READ);
     /*Envoi de l'adresse*/
-    writeSPI2(addr_tab[0]);
-    writeSPI2(addr_tab[1]);
     writeSPI2(addr_tab[2]);
+    writeSPI2(addr_tab[1]);
+    writeSPI2(addr_tab[0]);
     value = writeSPI2(0);
     CS = 1;
     return value;
@@ -252,9 +253,12 @@ void WRITE_cmd_32(unsigned char addr_tab[], int data) { // write a 32-bit value 
     // perform a 32-bit write sequence (4 byte page write)
     CS = 0; // select the Serial EEPROM
     writeSPI2(WRITE); // write command
-    writeSPI2(addr_tab[0]); // address MSB first
-    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+
+
+    //Envoi des valeurs en little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
+    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+    writeSPI2(addr_tab[0]); // address MSB first
 
     writeSPI2(data >> 24);  // Envoi du MSB
     writeSPI2(data >> 16);  // Envoi du 2ème byte
@@ -273,9 +277,10 @@ unsigned int READ_cmd_32(unsigned char addr_tab[])
     CS = 0; // select the Serial EEPROM
     writeSPI2(READ); // read command
 
-    writeSPI2(addr_tab[0]); // address MSB first
-    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+    //Envoi des valeurs en little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
+    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+    writeSPI2(addr_tab[0]); // address MSB first
 
     i = writeSPI2( 0);   // send dummy, read msb
     i = (i << 8) + writeSPI2(0); // send dummy, read lsb
@@ -288,15 +293,18 @@ unsigned int READ_cmd_32(unsigned char addr_tab[])
 void WRITE_cmd_n (unsigned char addr_tab[],unsigned char data[],unsigned char n)
 {
     char i;
-    //while (RDSR_cmd() & 0x1); // check the WIP flag
+    while (RDSR_cmd() & 0x1){break;}; // check the WIP flag
 
      WREN_cmd();
+
     // perform a 32-bit write sequence (4 byte page write)
     CS = 0; // select the Serial EEPROM
     writeSPI2(WRITE); // write command
-    writeSPI2(addr_tab[0]); // address MSB first
-    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+    
+    //Envoi des valeurs en little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
+    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+    writeSPI2(addr_tab[0]); // address MSB first
 
     for(i=0;i<n;i++)
     {
@@ -310,14 +318,15 @@ void READ_cmd_n(unsigned char addr_tab[],unsigned char data[],unsigned char n)
     // read a 32-bit value starting at an even address
     char i;
     // wait until any work in progress is completed
-    //while (RDSR_cmd() & 0x1); // check WIP
+    while (RDSR_cmd() & 0x1){break;}; // check the WIP flag
     // perform a 16-bit read sequence (two byte sequential read)
     CS = 0; // select the Serial EEPROM
     writeSPI2(READ); // read command
 
-    writeSPI2(addr_tab[0]); // address MSB first
-    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+    //Envoi des valeurs en little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
+    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+    writeSPI2(addr_tab[0]); // address MSB first
 
    for(i=0;i<n;i++)
    {
@@ -338,9 +347,10 @@ int READ_string(unsigned char addr_tab[],unsigned char* data,unsigned char n)
     CS = 0; // select the Serial EEPROM
     writeSPI2(READ); // read command
 
-    writeSPI2(addr_tab[0]); // address MSB first
-    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+    //Envoi des valeurs en little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
+    writeSPI2(addr_tab[1]); // address LSB (word aligned)
+    writeSPI2(addr_tab[0]); // address MSB first
 
    for(i=0;i<n;i++)
    {

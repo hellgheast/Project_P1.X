@@ -8,6 +8,7 @@ extern union myadress actual_log;
 extern union myadress end_log;
 union myadress var;
 
+
 #define DEBUG
 #define begin_tab    &begin_log.nb[1]
 #define actual_tab   &actual_log.nb[1]
@@ -22,48 +23,21 @@ void Init_user_gestion (void)
     actual_log.adress   = 768;
     end_log.adress      = 768;
 
+    union myadress temp;
     union myadress var;
     char buffer [64];
+    char i;
 
-    //Ecriture
-    var.adress = 0;
-    WRITE_cmd_n(var.nb,begin_log.nb,4);
-    sprintf(buffer,"%x\n",begin_log.adress);
-    putsU3(buffer);
-    
-    //Lecture
-    READ_cmd_n(var.nb,begin_log.nb,4);
-    sprintf (buffer,"Valeur lue : %d\n",begin_log.adress);
-    putsU3(buffer);
+    temp.adress = 0x300;
 
-    putsU3("Begin writed\n");
-
-    //Ecriture
-    var.adress = 32;
-    WRITE_cmd_n(var.nb,actual_log.nb,4);
-    sprintf(buffer,"%x\n",actual_log.adress);
-    putsU3(buffer);
-
-    //Lecture
-    READ_cmd_n(var.nb,actual_log.nb,4);
-    sprintf (buffer,"Valeur lue : %d\n",actual_log.adress);
-    putsU3(buffer);
-    putsU3("Actual writed\n");
-
-    //Ecrtiture
-    var.adress = 64;
-    WRITE_cmd_n(var.nb,end_log.nb,4);
-    sprintf(buffer,"%x\n",end_log.adress);
-    putsU3(buffer);
-
-    //Lecture
-    READ_cmd_n(var.nb,end_log.nb,4);
-    sprintf (buffer,"Valeur lue : %d\n",end_log.adress);
-    putsU3(buffer);
-    putsU3("End writed\n");
-
-  //  AddUser("ADMIN***","TEST****");
-  
+    for(var.adress=0,i=0;i<3;i++)
+    {
+      //Ecriture
+      WRITE_cmd_n(&var.nb[1],&temp.nb[1],3);
+      sprintf(buffer,"%x\n",temp.adress);
+      putsU3(buffer);
+      var.adress = var.adress +3;
+    }
 }
 
 void Read_log_adress (void)
@@ -71,23 +45,20 @@ void Read_log_adress (void)
     union myadress var;
     char buffer [64];
 
-    var.adress = 0x000;
-    READ_cmd_n(var.nb,begin_log.nb,4);
-
+    var.adress = 0x0;
+    READ_cmd_n(&var.nb[1],&begin_log.nb[1],3);
     sprintf(buffer,"ADRESSE : %x BEGIN : %x\n",var.adress,begin_log.adress);
     putsU3(buffer);
 
-    var.adress = 0x020;
-    READ_cmd_n(var.nb,actual_log.nb,4);
-
+    var.adress = 0x3;
+    READ_cmd_n(&var.nb[1],&actual_log.nb[1],3);
     sprintf(buffer,"ADRESSE : %x ACTUAL : %x\n",var.adress,actual_log.adress);
     putsU3(buffer);
 
 
-    var.adress = 0x040;
-    READ_cmd_n(var.nb,end_log.nb,4);
-
-    sprintf(buffer,"END : %x BEGIN : %x\n",var.adress,begin_log.adress);
+    var.adress = 0x6;
+    READ_cmd_n(&var.nb[1],&end_log.nb[1],3);
+    sprintf(buffer,"ADRESSE : %x END : %x\n",var.adress,begin_log.adress);
     putsU3(buffer);
 
 }
@@ -97,14 +68,14 @@ void Write_log_addres (void)
     union myadress var;
     char buffer [64];
 
-    var.adress = 0x000;
-    WRITE_cmd_n(var.nb,begin_log.nb,4);
+    var.adress = 0x0;
+    WRITE_cmd_n(&var.nb[1],&begin_log.nb[1],3);
 
-    var.adress = 0x020;
-    WRITE_cmd_n(var.nb,actual_log.nb,4);
+    var.adress = 0x3;
+    WRITE_cmd_n(&var.nb[1],&actual_log.nb[1],3);
 
-    var.adress = 0x040;
-    WRITE_cmd_n(var.nb,end_log.nb,4);
+    var.adress = 0x6;
+    WRITE_cmd_n(&var.nb[1],&end_log.nb[1],3);
 }
 
 //Prototypes de fonctions
@@ -124,17 +95,20 @@ int  AddUser    (char* user,char* password)
     //Lecture dans la liste
     for(actual_log.adress = begin_log.adress;actual_log.adress!=0x360;actual_log.adress += 18 )
     {
-        READ_string(actual_log.nb,buffer,32);
+        
+        READ_string(&actual_log.nb[1],buffer,32);
+
         if(strcmp(buffer,"********")==0)
         {
-            WRITE_cmd_n(actual_log.nb,user,strlen(user)+1);
+            WRITE_cmd_n(&actual_log.nb[1],user,strlen(user)+1);
             actual_log.adress +=strlen(user)+1;
-            WRITE_cmd_n(actual_log.nb,password,strlen(password)+1);
+            WRITE_cmd_n(&actual_log.nb[1],password,strlen(password)+1);
             actual_log.adress+=strlen(password)+1;
-            Write_log_addres();
             break;
         }
     }
+
+    Write_log_addres();
 
     //On indique que le nombre d'utilisateur maximum à été atteint.
     if (actual_log.adress == 0x360)
@@ -245,48 +219,15 @@ void ModifiyPassWord (char* user,char* new_password)
 void ListInit (void)
 {
     union myadress temp_adress;
-    int address_value = 0x300;
+    int i;
     unsigned char debug_buffer [64];
     unsigned char buffer [9] = "********";
-
+    
     //Fonction pour initialiser la liste a vide
-    temp_adress.adress = ConvertLittletoBig(address_value);
-    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
-    putsU3(debug_buffer);
-    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
-
-    address_value += 9;
-    temp_adress.adress = ConvertLittletoBig(address_value);
-    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
-    putsU3(debug_buffer);
-    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
-
-    address_value += 9;
-    temp_adress.adress = ConvertLittletoBig(address_value);
-    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
-    putsU3(debug_buffer);
-    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
-
-    address_value += 9;
-    temp_adress.adress = ConvertLittletoBig(address_value);
-    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
-    putsU3(debug_buffer);
-    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
-
-    address_value += 9;
-    temp_adress.adress = ConvertLittletoBig(address_value);
-    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
-    putsU3(debug_buffer);
-    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
-
-    address_value += 9;
-    temp_adress.adress = ConvertLittletoBig(address_value);
-    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
-    putsU3(debug_buffer);
-    WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
-
-    sprintf(debug_buffer,"%d %d %d %d\n",temp_adress.nb[0],temp_adress.nb[1],temp_adress.nb[2],temp_adress.nb[3]);
-    putsU3(debug_buffer);
-
-
+    for(temp_adress.adress = 0x300,i=0;i<12;i++,temp_adress.adress+=9)
+    {
+       sprintf(debug_buffer,"ADDR_INIT : %x",temp_adress.adress);
+       putsU3(debug_buffer);
+       WRITE_cmd_n(&temp_adress.nb[1],buffer,9);
+    }   
 }
