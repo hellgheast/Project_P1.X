@@ -77,7 +77,7 @@ void SPI2Init(void)
 
     SPI2CONbits.FRMEN		= 0;	// non-framed mode
 
-    SPI2BRG = 4;                        //Il s'agit du diviseur de fréquence Fsck = Fpb / 2* (SPIxBRG+1)
+        SPI2BRG = 16;                        //Il s'agit du diviseur de fréquence Fsck = Fpb / 2* (SPIxBRG+1)
 
     SPI2CONbits.ON 		= 1; 	// enable SPI port, clear status
 
@@ -293,7 +293,7 @@ unsigned int READ_cmd_32(unsigned char addr_tab[])
 void WRITE_cmd_n (unsigned char addr_tab[],unsigned char data[],unsigned char n)
 {
     char i;
-    while (RDSR_cmd() & 0x1){break;}; // check the WIP flag
+    while (RDSR_cmd() & 0x1){} // check the WIP flag
 
      WREN_cmd();
 
@@ -318,7 +318,8 @@ void READ_cmd_n(unsigned char addr_tab[],unsigned char data[],unsigned char n)
     // read a 32-bit value starting at an even address
     char i;
     // wait until any work in progress is completed
-    while (RDSR_cmd() & 0x1){break;}; // check the WIP flag
+    while (RDSR_cmd() & 0x1){} // check the WIP flag
+
     // perform a 16-bit read sequence (two byte sequential read)
     CS = 0; // select the Serial EEPROM
     writeSPI2(READ); // read command
@@ -341,8 +342,10 @@ int READ_string(unsigned char addr_tab[],unsigned char* data,unsigned char n)
 {
     // read a 32-bit value starting at an even address
     int i;
+
     // wait until any work in progress is completed
     // while (RDSR_cmd() & 0x1); // check WIP
+
     // perform a 16-bit read sequence (two byte sequential read)
     CS = 0; // select the Serial EEPROM
     writeSPI2(READ); // read command

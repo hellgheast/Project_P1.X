@@ -35,7 +35,7 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 //Definitions
 #define UART
 #define BUFFER_SIZE 128
-#undef DEBUG
+#define DEBUG
 
 
 //Prototypes de fonctions
@@ -144,8 +144,6 @@ int main(int argc, char** argv)
     
     float value;
 
-    union myfloat test;
-
     
     /*Configuration des entrées sorties*/
     PORTSetPinsDigitalOut(IOPORT_C,BIT_1);
@@ -184,7 +182,12 @@ int main(int argc, char** argv)
         {
             case 0:
             {
-                putsU3("LOGIN OK");
+                int temp;
+                temp = CheckUser(user,password);
+                if(temp==1)
+                {
+                  putsU3("LOGIN OK");
+                }
                 break;
             }
 
@@ -291,6 +294,43 @@ int main(int argc, char** argv)
               break;
             }
 
+            case 53:
+            {
+              //test du rajout d'utilisateur
+              sscanf(function,"%s,%s",user,password);
+              //Ecriture du compte en mémoire
+              AddUser(user,password);
+              break;
+            }
+
+            case 54:
+            {
+                //test du rajout d'utilisateur
+                sscanf(function,"%s",user);
+                //Ecriture du compte en mémoire
+                DeleteUser(user);
+                break;
+            }
+
+            case 55:
+            {
+
+                //Test de la modification du mot de passe.
+                sscanf(function,"%s,%s",user,buffer_s);
+                //Modification du mot de passe.
+                ModifiyPassWord(user,buffer_s);
+                break;
+            }
+
+            case 56:
+            {
+                //test de la vérification d'un USER
+                sscanf(function,"%s",user);
+                //Ecriture du compte en mémoire
+                CheckUser(user,"00000");
+                break;
+            }
+
 
             case 230:
             {
@@ -318,21 +358,12 @@ int main(int argc, char** argv)
             case 240:
             {
                 var.adress = 0x300;
-                //test du rajout d'utilisateur
-                sscanf(function,"%s %s",user,password);
-                //Ecriture du compte en mémoire
-                AddUser(user,password);
-                break;
+             
             }
             
             case 241:
             {
-                var.adress = 0x300;
-                //test du rajout d'utilisateur
-                sscanf(function,"%s %s",user,password);
-                //Ecriture du compte en mémoire
-                DeleteUser(user);
-                break;
+                
             }
 
             case 251:
@@ -394,30 +425,20 @@ int main(int argc, char** argv)
 #ifdef SPI
 
         SPI2Init();
-        
+        int i=0;
+        union myadress test ;
         while(1)
         {
+
             for (i=0; i<0xfffff; i++);
 
-            mon_adresse_b[0] = 0x03;
-            mon_adresse_b[1] = 0x02;
-            mon_adresse_b[2] = 0x01;
-           
-            CS=0;
-            writeSPI2(0x06);
-            CS=1;
-            //WRITE_cmd(mon_adresse_b,0x01);
+            
+            
+            test.adress = 0x300;
+            WRITE_cmd(test.nb,32);
+            test.adress += 9;
+            WRITE_cmd(test.nb,32);
 
-           /* d1=READ_cmd(mon_adresse);
-            if(d1==0b10001000)
-            {
-                LED4 = 1;
-            }
-            else
-            {
-                LED4 = 0;
-            }*/
-           
         }
 
         SpiChnClose(2);
@@ -442,6 +463,7 @@ void __ISR(_UART2_VECTOR, ipl2) IntUart2Handler(void)
             
             memset(buffer,0,128);   //On vide le buffer
             memset(function,0,128); //On remet la chaine des paramètres à zéro
+            memset(buffer_s,0,128); //On remet le buffer à zéro.
             CMD = 8012;             //On remet la variable par défaut
 
             if(U2STAbits.FERR == 0 && U2STAbits.PERR == 0 )
@@ -489,7 +511,7 @@ void WriteByte (void)
   putsU3(function);
 
   datac = data;
-  WRITE_cmd(&mon_adresse.nb[1],datac);
+  WRITE_cmd(mon_adresse.nb,datac);
 
   putsU3("WRITE END\n");
 }
@@ -509,7 +531,7 @@ void ReadByte(void)
     putsU3(function);
 
     
-    datac = READ_cmd(&mon_adresse.nb[1]);
+    datac = READ_cmd(mon_adresse.nb);
     sprintf(function,"la donnée vaut %d\n",datac);
     putsU3(function);
 
@@ -533,7 +555,7 @@ void FloatWrite(void)
     putsU3(function);
 
     //Ecriture dans l'EEPROM du flottant
-    WRITE_cmd_n(&mon_adresse.nb[1],value.nb,sizeof(value.f));
+    WRITE_cmd_n(mon_adresse.nb,value.nb,sizeof(value.f));
     putsU3("WRITE FLOAT END\n\r");
 }
 
@@ -552,7 +574,7 @@ void FloatRead (void)
   putsU3(function);
 
   //Lecture dans l'EEPROM
-  READ_cmd_n(&mon_adresse.nb[1],value.nb,sizeof(value.f));
+  READ_cmd_n(mon_adresse.nb,value.nb,sizeof(value.f));
 
   sprintf(function,"la donnée vaut %f\n",value.f);
   putsU3(function);
@@ -569,10 +591,10 @@ void StringWrite(void)
 
   putsU3("WRITE STRING MODE");
   sscanf(function,"%d,%s",&mon_adresse.adress,buffer_s);
-  sprintf(function,"mon adresse est %d,%d,%d et la chaine est : %s\n",mon_adresse.adress,buffer_s);
+  sprintf(function,"mon adresse est %d et la chaine est : %s\n",mon_adresse.adress,buffer_s);
   putsU3(function);
 
-  WRITE_cmd_n(&mon_adresse.nb[1],buffer_s,strlen(buffer_s)+1);
+  WRITE_cmd_n(mon_adresse.nb,buffer_s,strlen(buffer_s)+1);
   putsU3("WRITE STRING END\n\r");
 }
 
@@ -587,7 +609,7 @@ void StringRead(void)
   sprintf(function,"mon adresse est %d\n",mon_adresse.adress);
   putsU3(function);
 
-  READ_string(&mon_adresse.nb[1],buffer_s,BUFFER_SIZE);
+  READ_string(mon_adresse.nb,buffer_s,BUFFER_SIZE);
   sprintf(buffer,"La chaîne est %s \n",buffer_s);
   putsU3(buffer);
   putsU3("READ STRING END\n\r");
