@@ -16,9 +16,6 @@ Modification : Version initiale
 #include "General_func.h"
 #include "FSconfig.h"
 
-
-
-
 #ifndef SD_CARD_H
 #define	SD_CARD_H
 
@@ -56,8 +53,10 @@ typedef unsigned LBA;
 
 //Prototypes de fonctions
 void InitSD(void);
-int sendSDCmd (unsigned char cmd,unsigned char address[]);
+int sendSDCmd (unsigned char cmd,unsigned address);
 int initMedia(void);
+int readSECTOR (LBA ,char *);
+int writeSECTOR (LBA ,char *);
 
 //Fonctions
 void InitSD (void)
@@ -86,19 +85,18 @@ void InitSD (void)
     SPI2CONbits.ON 		= 1; 	// enable SPI port, clear status
 }
 
-int sendSDCmd (unsigned char cmd,unsigned char address[])
+int sendSDCmd (unsigned char cmd,unsigned address)
 {
     //Variables locales
     char i;
     int reponse;
 
-
     writeSPI2(cmd | 0x40);//Envoi de la commande
 
-    writeSPI2(address[3]);//MSB de l'adresse
-    writeSPI2(address[2]);
-    writeSPI2(address[1]);
-    writeSPI2(address[0]);//LSB de l'adresse
+    writeSPI2(address>>24);//MSB de l'adresse
+    writeSPI2(address>>16);
+    writeSPI2(address>>8);
+    writeSPI2(address);//LSB de l'adresse
 
     writeSPI2( 0x95);   // send CMD0 CRC
 
@@ -253,7 +251,6 @@ int writeSECTOR (LBA address, char* pointer)
     //On renvoit true si tout c'est bien passé
     return reponse;
 }
-
 
 
 
