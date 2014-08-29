@@ -24,7 +24,7 @@ int  AddUser    (char* user,char* password);
 void DeleteUser (char* user);
 int  CheckUser  (char* user,char* password);
 void GetUsers   (void);
-void ModifiyPassWord (char* user,char* new_password);
+int ModifiyPassWord (char* user,char* new_password);
 
 //
 void Read_log_adress (void);
@@ -33,6 +33,7 @@ void Write_log_addres (void);
 
 //Fonction d'initialisation de la liste
 void ListInit (void);
+int CheckLogin(char* user, char* password);
 
 
 

@@ -253,7 +253,7 @@ DWORD get_fattime(void)
 	DWORD tmr;
 
 	INTDisableInterrupts();
-        tmr = 000000000;
+        
         INTEnableInterrupts();
 
 	return tmr;

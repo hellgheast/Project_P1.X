@@ -168,12 +168,12 @@ int main(int argc, char** argv)
            
       if (done == 1)
       {
-        //sscanf(buffer,"%s,%s,%d,%s",user,password,&CMD,function);
-        //
-
+     
       #ifdef DEBUG
-          sprintf(buffer,"CMD : %d PARAM : %s",CMD,function);
-      #endif
+          sprintf(buffer,"CMD : %d PARAM : %s\n",CMD,function);
+          putsU3(buffer);
+        #endif
+
       }
         
 
@@ -182,12 +182,7 @@ int main(int argc, char** argv)
         {
             case 0:
             {
-                int temp;
-                temp = CheckUser(user,password);
-                if(temp==1)
-                {
-                  putsU3("LOGIN OK");
-                }
+                CheckLogin(user,password);
                 break;
             }
 
@@ -253,27 +248,27 @@ int main(int argc, char** argv)
 
             case 24:
             {
-                StringWrite();
-                break;
+              StringWrite();
+              break;
             }
 
             case 25:
             {
-                StringRead();
-                break;
+              StringRead();
+              break;
             }
 
             case 26:
             {
-                CE_cmd();
-                putsU3("CHIP ERASED");
-                break;
+              CE_cmd();
+              putsU3("CHIP ERASED");
+              break;
             }
 
             case 40:
             {
-                GetTime();
-                break;
+              GetTime();
+              break;
             }
 
             case 50:
@@ -287,7 +282,7 @@ int main(int argc, char** argv)
               GetUsers();
               break;
             }
-
+    
             case 52:
             {
               Read_log_adress ();
@@ -325,47 +320,30 @@ int main(int argc, char** argv)
             case 56:
             {
                 //test de la vérification d'un USER
-                sscanf(function,"%s",user);
+                sscanf(function,"%s,%s",user,password);
                 //Ecriture du compte en mémoire
-                CheckUser(user,"00000");
+                CheckLogin(user,password);
+                break;
+            }
+
+            case 57:
+            {
+                ListInit();
                 break;
             }
 
 
             case 230:
             {
-              SetCommandMode();
-              Disconnect();
-              QuitCommandMode();
-              break;
+                SetCommandMode();
+                Disconnect();
+                QuitCommandMode();
+                break;
             }
 
            
 
             #ifdef DEBUG
-            case 27:
-            {
-                WREN_cmd();
-                break;
-            }
-
-            case 239:
-            {
-                ListInit();
-                break;
-            }
-
-            case 240:
-            {
-                var.adress = 0x300;
-             
-            }
-            
-            case 241:
-            {
-                
-            }
-
             case 251:
             {
                 //
