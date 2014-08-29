@@ -250,10 +250,40 @@ TCHAR* f_gets (TCHAR*, int, FIL*);					/* Get a string from the file */
 DWORD get_fattime (void);
 DWORD get_fattime(void)
 {
-	DWORD tmr;
+        unsigned int year,month,day,heure,minute,seconde,temp;
+    
+        DWORD tmr;
 
-	INTDisableInterrupts();
+        //Initialisation
+        tmr = 0x0000;
+
+        year    = (RTCDATEbits.YEAR10*10+RTCDATEbits.YEAR01)+20;
+        month   = RTCDATEbits.MONTH10*10+RTCDATEbits.MONTH01;
+        day     = RTCDATEbits.DAY10*10+RTCDATEbits.DAY01;
+        heure   = RTCTIMEbits.HR10*10+RTCTIMEbits.HR01;
+        minute  = RTCTIMEbits.MIN10*10+RTCTIMEbits.MIN01;
+        seconde = RTCTIMEbits.SEC10*10+RTCTIMEbits.SEC01;
+
+
+        INTDisableInterrupts();
         
+        temp = year <<25;
+        tmr  = tmr|temp;
+
+        temp = month << 21;
+        tmr  = tmr|temp;
+        
+        temp = day << 16;
+        tmr = tmr|temp;
+       
+        temp = heure << 11;
+        tmr = tmr|temp;
+
+        temp = minute << 5;
+        tmr = tmr|temp;
+
+        tmr = tmr|seconde;
+
         INTEnableInterrupts();
 
 	return tmr;
