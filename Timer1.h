@@ -1,22 +1,22 @@
 /********************************************************************
-Fichier      : AMN1111.h
+Fichier      : Timer1.h
 ---------------------------------------------------------------------
-Auteur       : ISMAIL BEN SALAH
+Auteur       : ISMAIL BEN SALAH && Damien Gygi
 Compilateur  : MPLAB X
-Date         : 25. août 2014
+Date         : 30. août 2014
 Version      : 2.05
 ---------------------------------------------------------------------
-Description  : Librairie de fonctionnement pour la gestion du chauffage.
+Description  : Librairie de fonctionnement du timer 1
 --------------------------Modifications------------------------------
 Version      : 1.0
-Modification : Version Initiale
+Modification : Ajout des fonctions pour la gestion de puissance
 *********************************************************************/
 
-#ifndef PWM_H
-#define	PWM_H
+#ifndef TIMER1_H
+#define	TIMER1_H
 
-void Regulation (void);
-void InitPWM (void);
+void TimerInit (void);
 
-#endif	/* PWM_H */
+
+#endif	/* TIMER1_H */
 

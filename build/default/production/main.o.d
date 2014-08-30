@@ -7,4 +7,5 @@ TL2350R.h  \
 Bluetooth_module.h  \
 RTCC.h  \
 User_Gestion.h  \
- Bluetooth_Module.h 
+ Bluetooth_Module.h  \
+Timer1.h 

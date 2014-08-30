@@ -2,11 +2,16 @@
 #include "General_func.h"
 
 
-//Variables locales
+//Variables externes
 extern union myadress begin_log;
 extern union myadress actual_log;
 extern union myadress end_log;
+
+
+
+//Variables globales
 union myadress var;
+unsigned char user_count;
 
 
 #define DEBUG
@@ -22,6 +27,7 @@ void Init_user_gestion (void)
     begin_log.adress    = 768;
     actual_log.adress   = 768;
     end_log.adress      = 768;
+    user_count          = 0;
 
     union myadress temp;
     union myadress var;
@@ -35,6 +41,10 @@ void Init_user_gestion (void)
       WRITE_cmd_n(var.nb,temp.nb,3);
       var.adress = var.adress +3;
     }
+
+    //Write the user counter to zero
+    var.adress = 0x10;
+    WRITE_cmd(var.nb,0);
 }
 
 void Read_log_adress (void)
@@ -50,7 +60,9 @@ void Read_log_adress (void)
     
     var.adress = 0x6;
     READ_cmd_n(var.nb,end_log.nb,3);
-    
+
+    var.adress = 0x10;
+    user_count = READ_cmd(var.nb);
 }
 
 void Write_log_addres (void)
@@ -66,6 +78,10 @@ void Write_log_addres (void)
 
     var.adress = 0x6;
     WRITE_cmd_n(var.nb,end_log.nb,3);
+    
+    var.adress = 0x10;
+    WRITE_cmd(var.nb,user_count);
+
 }
 
 //Prototypes de fonctions
@@ -78,7 +94,7 @@ int  AddUser    (char* user,char* password)
     Read_log_adress();
 
     //On indique que le nombre d'utilisateur maximum à été atteint.
-    if (actual_log.adress > 0x36C)
+    if (user_count == 6 )
     {
         putsU3("Nombre maximum d'utilisateurs atteints\n");
         return -2;
@@ -95,9 +111,7 @@ int  AddUser    (char* user,char* password)
     for(actual_log.adress = begin_log.adress,cnt=0;cnt<12;actual_log.adress += 18,cnt++ )
     {
         READ_string(actual_log.nb,buffer,32);
-        sprintf(printf_buffer,"STRING : %s\n USER : %s PASSWORD : %s \n",buffer,user,password);
-        putsU3(printf_buffer);
-
+       
         if(strcmp(buffer,"********")==0)
         {
     
@@ -107,6 +121,7 @@ int  AddUser    (char* user,char* password)
             WRITE_cmd_n(actual_log.nb,password,strlen(password)+1);
             actual_log.adress+=strlen(password)+1;
             cnt = 13;
+            user_count++;
             Write_log_addres();
             return 1;
 
@@ -133,11 +148,14 @@ void DeleteUser (char* user)
        size = READ_string(actual_log.nb,buffer,128);
        if (strcmp(user,buffer)==0)
        {
+
          WRITE_cmd_n(actual_log.nb,ERASER,9);
          actual_log.adress += 9;
          WRITE_cmd_n(actual_log.nb,ERASER,9);
          actual_log.adress += 9;
          state = 1;
+
+         user_count--;
          putsU3("User deleted\n");
          Write_log_addres();
        }
@@ -155,12 +173,9 @@ int  CheckUser  (char* user,char* password)
 
     Read_log_adress();
 
-    for(actual_log.adress = begin_log.adress,cnt=0;cnt<6;actual_log.adress += 18,cnt++ )
+    for(actual_log.adress = begin_log.adress,cnt=0;cnt<user_count;actual_log.adress += 18,cnt++ )
     {
         READ_string(actual_log.nb,get_buffer,64);
-        sprintf(buffer,"USER : %s\n",get_buffer);
-        putsU3(buffer);
-
         if(strcmp(user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
         {
             putsU3("User found\n");
@@ -182,11 +197,9 @@ int CheckLogin (char* user,char* password)
     int cnt;
     Read_log_adress();
 
-    for(actual_log.adress = begin_log.adress,cnt=0;cnt<6;actual_log.adress += 18,cnt++ )
+    for(actual_log.adress = begin_log.adress,cnt=0;cnt<user_count;actual_log.adress += 18,cnt++ )
     {
         READ_string(actual_log.nb,get_buffer,64);
-        sprintf(buffer,"USER : %s\n",get_buffer);
-        putsU3(buffer);
 
         if(strcmp(user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
         {
@@ -217,7 +230,7 @@ void GetUsers   (void)
 
   Read_log_adress();
 
-  for(actual_log.adress = begin_log.adress,cnt=0;cnt<6;actual_log.adress += 9,cnt++ )
+  for(actual_log.adress = begin_log.adress,cnt=0;cnt<user_count;actual_log.adress += 9,cnt++ )
     {
 
         READ_string(actual_log.nb,get_buffer,64);
@@ -241,8 +254,6 @@ int ModifiyPassWord (char* user,char* new_password)
     for(actual_log.adress = begin_log.adress;actual_log.adress!=0x36C;actual_log.adress += 9 )
     {
         READ_string(actual_log.nb,get_buffer,64);
-        sprintf(buffer,"USER : %s\n",get_buffer);
-        putsU3(buffer);
         actual_log.adress += 9;
         
         if(strcmp(user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
@@ -265,6 +276,9 @@ void ListInit (void)
     unsigned char debug_buffer [64];
     unsigned char buffer [9] = "********";
     
+    //Initialisation des différentes variables
+    Init_user_gestion();
+
     //Fonction pour initialiser la liste a vide
     for(temp_adress.adress = 0x300,i=0;i<12;i++,temp_adress.adress+=9)
     {

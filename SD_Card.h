@@ -129,7 +129,7 @@ int initMedia(void)
     //On sélectionne la carte
     enableSD();
 
-    //Envoit de la commande RESET à la carte SD
+    //Envoi de la commande RESET à la carte SD
     reponse = sendSDCmd(RESET,0);
     disableSD();
     //On retourne au mode IDLE

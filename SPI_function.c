@@ -137,10 +137,11 @@ void WRDI_cmd(void)
 
 unsigned char RDSR_cmd(void)
 {
-    char reg;
+    unsigned char reg;
     CS = 0;
     writeSPI2(RDSR);
     reg = writeSPI2(0);
+   // printf("REGISTER : %d\n",reg);
     CS=1;
     return reg;
 }
@@ -212,7 +213,7 @@ unsigned char RDID_cmd (unsigned char addr_tab[])
 
 void WRITE_cmd(unsigned char addr_tab[],unsigned char byte)
 {
-    //while(RDSR_cmd() & 0x1) ; // On vérifie si l'EEPROM est en cours de fonctionnement
+    while(RDSR_cmd() & 0x1) ; // On vérifie si l'EEPROM est en cours de fonctionnement
 
     /*Autorisation d'écriture*/
     WREN_cmd();
@@ -231,7 +232,7 @@ void WRITE_cmd(unsigned char addr_tab[],unsigned char byte)
 unsigned char READ_cmd (unsigned char addr_tab[])
 {
     int value;
-    //while(RDSR_cmd() & 0x1);  // On vérifie si l'EEPROM est en cours de fonctionnement
+    while(RDSR_cmd() & 0x1);  // On vérifie si l'EEPROM est en cours de fonctionnement
 
     CS = 0;
     /*Envoi de la commande*/

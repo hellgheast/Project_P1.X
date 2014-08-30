@@ -14,6 +14,7 @@
 /
 /----------------------------------------------------------------------------*/
 
+
 #ifndef _FATFS
 #define _FATFS	6502	/* Revision ID */
 
@@ -21,8 +22,9 @@
 extern "C" {
 #endif
 
-#include "integer.h"	/* Basic integer types */
+#include "integer.h"            /* Basic integer types */
 #include "ffconf.h"		/* FatFs configuration options */
+#include <peripheral/rtcc.h>    /*RTCC Library*/
 
 #if _FATFS != _FFCONF
 #error Wrong configuration file (ffconf.h).

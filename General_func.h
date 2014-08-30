@@ -35,6 +35,18 @@ void InitADC (void);
 void InitMemory (void);
 int  ConvertLittletoBig(int var);
 
+//Prototypes de fonctions
+void WriteByte  (void);
+void ReadByte   (void);
+void FloatWrite (void);
+void FloatRead  (void);
+void StringWrite(void);
+void StringRead (void);
+void GetTime    (void);
+void GetLight   (void);
+
+
+
 
 
 
@@ -83,6 +95,10 @@ char done;
 char cnt_debug;
 int  CMD;
 char buffer_s   [BUFFER_SIZE];
+
+unsigned char isAdmin;
+unsigned char isConnect;
+
 
 
 

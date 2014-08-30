@@ -114,7 +114,7 @@ int SetCommandMode (void)
     char* string = "$$$";
 
     char buf [SIZE_BUFFER];
-    putsU3NR(string);
+    putsU3NR("$$$");
     getsU3(buf,SIZE_BUFFER);
 
     //Permet de vérifier si le RN 42 s'est mis en mode commande
