@@ -97,7 +97,7 @@ int  CMD;
 char buffer_s   [BUFFER_SIZE];
 
 unsigned char isAdmin;
-unsigned char isConnect;
+unsigned char isLogged;
 
 
 

@@ -31,7 +31,8 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 #include "RTCC.h"
 #include "User_Gestion.h"
 #include "Timer1.h"
-
+#include "Gestion_Chauffage.h"
+#include "Gestion_Porte.h"
 
 //Definitions
 #define UART
@@ -96,10 +97,12 @@ extern int  CMD;
 extern char buffer_s   [BUFFER_SIZE];
 
 
+extern unsigned char isLogged;
+
 //Variables globales
 union myadress var;
 int count=1;
-
+char buffer2           [BUFFER_SIZE];
 
 //Définitions Hardware
 #define LED5 PORTCbits.RC1
@@ -115,6 +118,7 @@ void Init_module (void)
   SPI2Init();
   RTCCInit();
   TimerInit();
+  isLogged = 0;
 
   //Configuration des interrupts
 
@@ -184,12 +188,29 @@ int main(int argc, char** argv)
       #ifdef DEBUG
           sprintf(buffer,"CMD : %d PARAM : %s\n",CMD,function);
           putsU3(buffer);
-        #endif
+          isLogged = 1;
+      #endif
 
       }
-        
 
-    if(done==1){
+      #ifndef DEBUG
+      if(done==1 && isLogged == 0)
+      {
+        switch (CMD)
+        {
+            case 0:
+            {
+                CheckLogin(user,password);
+                done = 0;
+                break;
+            }
+        }
+      }    
+      #endif
+
+
+
+    if(done==1 && isLogged == 1){
         switch (CMD)
         {
             case 0:
@@ -304,40 +325,50 @@ int main(int argc, char** argv)
             case 53:
             {
               //test du rajout d'utilisateur
-              sscanf(function,"%s,%s",user,password);
+              sscanf(function,"%s,%s",buffer2,password);
               //Ecriture du compte en mémoire
-              AddUser(user,password);
+              AddUser(buffer2,password);
               break;
             }
 
             case 54:
             {
                 //test du rajout d'utilisateur
-                sscanf(function,"%s",user);
+                sscanf(function,"%s",buffer2);
                 //Ecriture du compte en mémoire
-                DeleteUser(user);
+                DeleteUser(buffer2);
                 break;
             }
 
             case 55:
             {
                 //Test de la modification du mot de passe.
-                sscanf(function,"%s,%s",user,buffer_s);
+                sscanf(function,"%s,%s",buffer2,buffer_s);
                 //Modification du mot de passe.
-                ModifiyPassWord(user,buffer_s);
+                ModifyPassWord(buffer2,buffer_s);
                 break;
             }
 
             case 56:
             {
                 //test de la vérification d'un USER
-                sscanf(function,"%s,%s",user,password);
+                sscanf(function,"%s,%s",buffer2,buffer_s);
                 //Ecriture du compte en mémoire
-                CheckLogin(user,password);
+                CheckLogin(buffer2,buffer_s);
                 break;
             }
 
+
             case 57:
+            {
+                //Modification du username
+                sscanf(function,"%s,%s",buffer2,buffer_s);
+                //Modification du Username
+                ModifiyUsername(buffer2,buffer_s);
+                break;
+            }
+
+            case 70:
             {
                 ListInit();
                 break;
@@ -345,7 +376,28 @@ int main(int argc, char** argv)
 
             case 80:
             {
+              int temp;
+              //Pour set le code pin de la porte
+              sscanf(function,"%d",&temp);
+              SetDoorCode(temp);
+              break;
+            }
 
+            case 81:
+            {
+              int temp;
+              //Command to check if the user have send the right pin code
+              sscanf(function,"%d",&temp);
+              CheckDoorPassword(temp);
+              break;
+            }
+
+            case 82:
+            {
+              int temp;
+              //Command to check if the user have send the right pin code
+              sscanf(function,"%d",&temp);
+              OpenDoor(temp);
               break;
             }
 
@@ -458,12 +510,14 @@ void __ISR(_UART2_VECTOR, ipl3) IntUart2Handler(void)
             memset(buffer,0,128);   //On vide le buffer
             memset(function,0,128); //On remet la chaine des paramètres à zéro
             memset(buffer_s,0,128); //On remet le buffer à zéro.
+            memset(user,0,128);     //ON remet le user à zéro.
+            memset(password,0,128);     //ON remet le user à zéro.
             CMD = 8012;             //On remet la variable par défaut
 
             if(U2STAbits.FERR == 0 && U2STAbits.PERR == 0 )
             {
+                putU3('K');
               getsU3(buffer,128);   //On récupère le message
-              cnt_debug++;          //La variable de débug s'incrémente
               done=1;               //On indique qu'une transmission c'est faite
             }
 
@@ -475,7 +529,7 @@ void __ISR(_UART2_VECTOR, ipl3) IntUart2Handler(void)
             #endif
 
             #ifndef DEBUG
-            sscanf(buffer,"%s,%s,%d,%s",user,password,&CMD,function);
+            sscanf(buffer," %s,%s,%d,%s",user,password,&CMD,function);
             #endif
 	}
 

@@ -8,4 +8,6 @@ Bluetooth_module.h  \
 RTCC.h  \
 User_Gestion.h  \
  Bluetooth_Module.h  \
-Timer1.h 
+Timer1.h  \
+Gestion_Chauffage.h  \
+Gestion_Porte.h 

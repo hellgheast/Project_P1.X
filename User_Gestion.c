@@ -6,6 +6,8 @@
 extern union myadress begin_log;
 extern union myadress actual_log;
 extern union myadress end_log;
+extern unsigned char isAdmin;
+extern unsigned char isLogged;
 
 
 
@@ -85,7 +87,7 @@ void Write_log_addres (void)
 }
 
 //Prototypes de fonctions
-int  AddUser    (char* user,char* password)
+int  AddUser    (char* p_user,char* p_password)
 {
     char buffer [32];
     char printf_buffer[64];
@@ -101,7 +103,7 @@ int  AddUser    (char* user,char* password)
     }
 
     //Vérification de la longeur des chaînes de caractères transmises.
-    if(strlen(user)+1 != 9 || strlen(password)+1 != 9)
+    if(strlen(p_user)+1 != 9 || strlen(p_password)+1 != 9)
     {
         return -1;
     }
@@ -115,10 +117,10 @@ int  AddUser    (char* user,char* password)
         if(strcmp(buffer,"********")==0)
         {
     
-            WRITE_cmd_n(actual_log.nb,user,strlen(user)+1);
+            WRITE_cmd_n(actual_log.nb,p_user,strlen(user)+1);
             actual_log.adress +=9;
 
-            WRITE_cmd_n(actual_log.nb,password,strlen(password)+1);
+            WRITE_cmd_n(actual_log.nb,p_password,strlen(password)+1);
             actual_log.adress+=strlen(password)+1;
             cnt = 13;
             user_count++;
@@ -128,12 +130,9 @@ int  AddUser    (char* user,char* password)
         }
     }
 
-    
-    
-   
     return 0;
 }
-void DeleteUser (char* user)
+void DeleteUser (char* p_user)
 {
     char buffer [128];
     char state = 0;
@@ -146,7 +145,7 @@ void DeleteUser (char* user)
     do{
 
        size = READ_string(actual_log.nb,buffer,128);
-       if (strcmp(user,buffer)==0)
+       if (strcmp(p_user,buffer)==0)
        {
 
          WRITE_cmd_n(actual_log.nb,ERASER,9);
@@ -165,7 +164,7 @@ void DeleteUser (char* user)
        }
     }while(state==0 && actual_log.adress < 0x36C);
 }
-int  CheckUser  (char* user,char* password)
+int  CheckUser  (char* p_user,char* p_password)
 {
     char buffer [64];
     char get_buffer[64];
@@ -176,7 +175,7 @@ int  CheckUser  (char* user,char* password)
     for(actual_log.adress = begin_log.adress,cnt=0;cnt<user_count;actual_log.adress += 18,cnt++ )
     {
         READ_string(actual_log.nb,get_buffer,64);
-        if(strcmp(user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
+        if(strcmp(p_user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
         {
             putsU3("User found\n");
 
@@ -190,7 +189,7 @@ int  CheckUser  (char* user,char* password)
 
 }
 
-int CheckLogin (char* user,char* password)
+int CheckLogin (char* p_user,char* p_password)
 {
     char buffer [64];
     char get_buffer[64];
@@ -200,14 +199,27 @@ int CheckLogin (char* user,char* password)
     for(actual_log.adress = begin_log.adress,cnt=0;cnt<user_count;actual_log.adress += 18,cnt++ )
     {
         READ_string(actual_log.nb,get_buffer,64);
+        printf("USER : %s\n",p_user);
+        printf("GET : %s\n",get_buffer);
 
-        if(strcmp(user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
+        
+        if(strcmp(p_user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
         {
             actual_log.adress +=9;
             READ_string(actual_log.nb,get_buffer,64);
-            if(strcmp(password,get_buffer)==0)
+            if(strcmp(p_password,get_buffer)==0)
             {
                 putsU3("LOGIN OK");
+                isLogged = 1;
+                if(strcmp(p_user,"ADMIN***")==0)
+                {
+                    isAdmin = 1;
+                }
+                else
+                {
+                    isAdmin = 0;
+                }
+
               return 1;
             }
 
@@ -243,7 +255,7 @@ void GetUsers   (void)
     }
 }
 
-int ModifiyPassWord (char* user,char* new_password)
+int ModifyPassWord (char* p_user,char* new_password)
 {
   char buffer [64];
     char get_buffer[64];
@@ -256,7 +268,7 @@ int ModifiyPassWord (char* user,char* new_password)
         READ_string(actual_log.nb,get_buffer,64);
         actual_log.adress += 9;
         
-        if(strcmp(user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
+        if(strcmp(p_user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
         {
             //On modifie le mot de passer
             WRITE_cmd_n(actual_log.nb,new_password,strlen(new_password)+1);
@@ -268,6 +280,33 @@ int ModifiyPassWord (char* user,char* new_password)
     return 0;
     
 }
+
+int ModifiyUsername (char* p_user,char* new_user)
+{
+  char buffer [64];
+    char get_buffer[64];
+
+
+    Read_log_adress();
+
+    for(actual_log.adress = begin_log.adress;actual_log.adress!=0x36C;actual_log.adress += 18 )
+    {
+        READ_string(actual_log.nb,get_buffer,64);
+
+        if(strcmp(p_user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
+        {
+            //On modifie le mot de passer
+            WRITE_cmd_n(actual_log.nb,new_user,strlen(new_user)+1);
+            putsU3("Username changed\n");
+            return 1;
+        }
+    }
+
+    return 0;
+
+}
+
+
 
 void ListInit (void)
 {

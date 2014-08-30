@@ -20,12 +20,12 @@ Modification : Version_initiale
 #define	USER_GESTION_H
 
 //Prototypes de fonctions
-int  AddUser    (char* user,char* password);
-void DeleteUser (char* user);
-int  CheckUser  (char* user,char* password);
+int  AddUser    (char* p_user,char* p_password);
+void DeleteUser (char* p_user);
+int  CheckUser  (char* p_user,char* p_password);
 void GetUsers   (void);
-int ModifiyPassWord (char* user,char* new_password);
-
+int ModifyPassWord (char* p_user,char* new_password);
+int ModifyUsername (char* p_user,char* new_user);
 //
 void Read_log_adress (void);
 void Init_user_gestion (void);
@@ -33,7 +33,7 @@ void Write_log_addres (void);
 
 //Fonction d'initialisation de la liste
 void ListInit (void);
-int CheckLogin(char* user, char* password);
+int CheckLogin(char* p_user, char* p_password);
 
 
 
