@@ -76,6 +76,7 @@ union myadress
 
  
 //Variables globales inter-fichier
+
 //Pointeur
 union myadress begin_temp;
 union myadress actual_temp;
@@ -85,6 +86,11 @@ union myadress end_temp;
 union myadress begin_log;
 union myadress actual_log;
 union myadress end_log;
+
+//Pointeur sur le début et la fin des notes
+union myadress begin_notes;
+union myadress end_notes;
+
 
 //Variables gloabes
 char buffer     [BUFFER_SIZE];

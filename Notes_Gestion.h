@@ -1,5 +1,5 @@
 /********************************************************************
-Fichier      : User_Gestion.h
+Fichier      : Notes_Gestion.h
 ---------------------------------------------------------------------
 Auteur       : ISMAIL BEN SALAH
 Compilateur  : MPLAB X
@@ -13,29 +13,30 @@ Modification : Mise en place du compteur d'utilisateur
 *********************************************************************/
 
 #include "General_func.h"
-#include "Bluetooth_Module.h"
 #include "SPI_function.h"
 
-#ifndef USER_GESTION_H
-#define	USER_GESTION_H
+#ifndef NOTES_GESTION_H
+#define	NOTES_GESTION_H
+
+extern union myadress begin_notes;
+extern union myadress end_notes;
+
 
 //Prototypes de fonctions
-int  AddUser    (char* p_user,char* p_password);
-void DeleteUser (char* p_user);
-int  CheckUser  (char* p_user,char* p_password);
-void GetUsers   (void);
-int ModifyPassWord (char* p_user,char* new_password);
-int ModifyUsername (char* p_user,char* new_user);
-//
-void Read_log_adress (void);
-void Init_user_gestion (void);
-void Write_log_addres (void);
+void AddNote (char* subject,char*detail,char* p_user,char* date,char* text);
+void InitNote (void)
+{
+    union myadress temp;
 
-//Fonction d'initialisation de la liste
-void ListInit (void);
-int CheckLogin(char* p_user, char* p_password);
+    begin_notes.adress = 0x10000;
+    end_notes.adress = 0x10000;
 
+    temp.adress = 0x0000B;
+    WRITE_cmd_n(temp.nb,begin_notes.nb,3);
 
-
-#endif	/* USER_GESTION_H */
+    temp.adress += 3;
+    WRITE_cmd_n(temp.nb,end_notes.nb,3);
+   
+}
+#endif	/* NOTES_GESTION_H */
 
