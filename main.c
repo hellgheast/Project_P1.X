@@ -503,7 +503,7 @@ int main(int argc, char** argv)
            
  }
 
-// UART 2 interrupt handler, set at priority level 3
+// UART 2 interrupt handler, set at priority level 4
 void __ISR(_UART2_VECTOR, ipl4) IntUart2Handler(void)
 {
 	// Is this an RX interrupt?

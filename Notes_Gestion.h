@@ -220,11 +220,17 @@ void ReadNote(char* subject, char* user)
 
               actual_notes.adress += 9;
               READ_string(actual_notes.nb,get_buffer,256);
-              printf("DESTINATAIRE : %s",get_buffer);
+              printf("DESTINATAIRE : %s\n",get_buffer);
 
               actual_notes.adress += 9;
+              READ_string(actual_notes.nb,get_buffer,256);
+              printf("DATE : %s\n",get_buffer);
 
-
+              actual_notes.adress += 11;
+              READ_string(actual_notes.nb,get_buffer,256);
+              printf("TEXTE : %s\n",get_buffer);
+              
+              cnt = user_count;
           }
           else
           {
