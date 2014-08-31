@@ -17,7 +17,6 @@
 #define ATTENTE   200           //Temps d'attente entre chaque affichage [ms]
 #define VREF      3.3           //Tension de référence [V]
 #define QUANTUM   0.00322265625 //QUANTUM = VREF/2^Nbbit[AD]
-#define K_CHANNEL   0             //Canal sélectionné
 /*------------------------------------------*/
 
 /*Fonctions*/
@@ -78,10 +77,10 @@ void InitADC_R()
 float delta_sqrt(float);
 float U_to_R(long);
 float temperature (float);
-float read_kty_81_220();
+float read_kty_81_220(int); //canal séléctionné: 0 température intérieure, 2 température extérieure.
 
 /*Opération de lecture,convertion,retour de valeur*/
-float read_kty_81_220(void)
+float read_kty_81_220(int channel)
 {
   int i;
   long value = 0;//Variable pour  la valeur décimale lue sur le convertisseur AD
@@ -93,7 +92,7 @@ float read_kty_81_220(void)
 
   DelayMs(1);
   while ( AD1CON1bits.DONE==0 ) { }
-  value=ReadADC10(K_CHANNEL);
+  value=ReadADC10(channel);
   //DelayMs(ATTENTE);
   
   resistor=U_to_R(value);
