@@ -42,11 +42,11 @@ unsigned char  RDID_cmd    (unsigned char addr_tab[]);//Release from Deep Power 
 
 void  WRITE_cmd   (unsigned char addr_tab[],unsigned char byte);
 void  WRITE_cmd_32(unsigned char addr_tab[],int data);
-void  WRITE_cmd_n (unsigned char addr_tab[],unsigned char data[], unsigned char n);
+void  WRITE_cmd_n (unsigned char addr_tab[],unsigned char data[], unsigned int n);
 unsigned char  READ_cmd       (unsigned char addr_tab[]);
 unsigned int   READ_cmd_32    (unsigned char addr_tab[]);
-void READ_cmd_n(unsigned char addr_tab[],unsigned char *data,unsigned char n);
-int READ_string(unsigned char addr_tab[],unsigned char *data,unsigned char n);
+void READ_cmd_n(unsigned char addr_tab[],unsigned char *data,unsigned int n);
+int READ_string(unsigned char addr_tab[],unsigned char *data,unsigned int n);
 
 unsigned char writeSPI2      (unsigned char data );
 unsigned char readSPI2       (void);

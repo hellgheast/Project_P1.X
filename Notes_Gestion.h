@@ -39,9 +39,12 @@ extern union myadress end_notes;
 unsigned char notes_count;
 
 //Prototypes de fonctions
-void AddNote (char* subject,char* text,char* p_user,char* date,int data_length);
-void DeleteNote (char* subject,char* text,char* p_user,char* date,int data_length);
+void AddNote (char* subject,char* text,char* p_user,char* date);
+void DeleteNote (char* subject,char* text,char* p_user,char* date);
 void ReadNote (char* subject,char*user);
+
+void ReadPublicNotes (char* user);
+void ReadPersonnalNotes (char* user);
 
 void Read_notes_pointer(void);
 void Write_notes_pointer(void);
@@ -71,7 +74,7 @@ void InitNote (void)
     WRITE_cmd(temp.nb,notes_count);
 
     temp.adress = 0x10000;
-    WRITE_cmd_n(temp.adress,buffer,9);
+    WRITE_cmd_n(temp.nb,buffer,9);
 
 }
 
@@ -82,15 +85,21 @@ void Read_notes_pointer(void)
   
   temp.adress = 0x0000B;
   READ_cmd_n(temp.nb,begin_notes.nb,3);
-    
+  printf("BEGIN : %d\n",begin_notes.adress);
+
+
   temp.adress += 3;
   READ_cmd_n(temp.nb,actual_notes.nb,3);
-    
+  printf("ACTUAL : %d\n",actual_notes.adress);
+
   temp.adress += 3;
   READ_cmd_n(temp.nb,end_notes.nb,3);   
+  printf("END : %d\n",end_notes.adress);
 
   temp.adress += 1;
   notes_count = READ_cmd(temp.nb);
+
+  printf("NOTES COUNT: %u \n",notes_count);
 }
 
 //Fonction d'écriture des adresses des pointeurs en mémoire
@@ -106,6 +115,9 @@ void Write_notes_pointer(void)
 
     temp.adress += 3;
     WRITE_cmd_n(temp.nb,end_notes.nb,3);
+
+    temp.adress += 1;
+    WRITE_cmd(temp.nb,notes_count);    
 }
 
 
@@ -115,7 +127,7 @@ void AddNote (char* subject,char* text,char* p_user,char* date)
     mynote NotetoSend;
     char get_buffer [32];
     char ERASER [9]="********";
-    bool get_free=0;
+    int get_free=0;
 
     //Copie des données dans la structure
     strcpy(NotetoSend.Subject,subject);
@@ -145,8 +157,7 @@ void AddNote (char* subject,char* text,char* p_user,char* date)
     while (get_free==0);
 
 
-    //Ecriture en mémoire de la note.
-
+    //Ecriture en memoire de la note.
     WRITE_cmd_n(actual_notes.nb,NotetoSend.Subject,9);
     actual_notes.adress += 9;
 
@@ -168,7 +179,7 @@ void AddNote (char* subject,char* text,char* p_user,char* date)
     Write_notes_pointer();
 }
 
-void DeleteNote (char* subject,char*detail,char* p_user,char* date,char* text,int data_length)
+void DeleteNote (char* subject,char* text,char* p_user,char* date)
 {
     //Variables
     char get_buffer[64];
@@ -196,41 +207,41 @@ void DeleteNote (char* subject,char*detail,char* p_user,char* date,char* text,in
         actual_notes.adress += 9 + 9 + 11 + 129;
       }
     }
-    while(cnt<user_count);
+    while(cnt<notes_count);
 }
 
 void ReadNote(char* subject, char* user)
 {
     unsigned char cnt;
-    unsigned get_buffer [256];
+    unsigned char get_buffer [256];
     //Lecture des pointeurs et des informations concernant les notes
     Read_notes_pointer();
 
     //On commence par le débt de la chaine
     actual_notes.adress = begin_notes.adress;
 
-    for (cnt=0;cnt<user_count;)
+    for (cnt=0;cnt<notes_count;)
     {
       READ_cmd_n(actual_notes.nb,get_buffer,9);
-      if (strcmp(get_buffer,"********"!=0))
+      if (strcmp(get_buffer,"********")!=0)
       {
           if(strcmp(get_buffer,subject)==0)
           {
               printf("SUBJECT : %s\n",get_buffer);
 
               actual_notes.adress += 9;
-              READ_string(actual_notes.nb,get_buffer,256);
+              READ_cmd_n(actual_notes.nb,get_buffer,9);
               printf("DESTINATAIRE : %s\n",get_buffer);
 
               actual_notes.adress += 9;
-              READ_string(actual_notes.nb,get_buffer,256);
+              READ_cmd_n(actual_notes.nb,get_buffer,11);
               printf("DATE : %s\n",get_buffer);
 
               actual_notes.adress += 11;
               READ_string(actual_notes.nb,get_buffer,256);
               printf("TEXTE : %s\n",get_buffer);
-              
-              cnt = user_count;
+
+              actual_notes.adress += 129;
           }
           else
           {
@@ -245,6 +256,61 @@ void ReadNote(char* subject, char* user)
     }
 
 }
+
+//Fonction pour lire les notes personelles
+void ReadPersonnalNotes(char* user)
+{
+    unsigned char cnt;
+    unsigned char get_subject [9];
+    unsigned char get_buffer [256];
+
+    //Lecture des pointeurs et des informations concernant les notes
+    Read_notes_pointer();
+
+    //On commence par le débt de la chaine
+    actual_notes.adress = begin_notes.adress;
+
+    for (cnt=0;cnt<notes_count;cnt++)
+    {
+      READ_cmd_n(actual_notes.nb,get_subject,9);
+      if (strcmp(get_subject,"********")!=0)
+      {
+          actual_notes.adress += 9;
+          READ_cmd_n(actual_notes.nb,get_buffer,9);
+
+          if(strcmp(get_buffer,user)==0)
+          {
+              printf("SUBJECT : %s\n",get_subject);
+              memset(get_subject,0,9);
+              
+              printf("DESTINATAIRE : %s\n",get_buffer);
+
+              actual_notes.adress += 9;
+              READ_cmd_n(actual_notes.nb,get_buffer,11);
+              printf("DATE : %s\n",get_buffer);
+
+              actual_notes.adress += 11;
+              READ_string(actual_notes.nb,get_buffer,256);
+              printf("TEXTE : %s\n",get_buffer);
+
+              actual_notes.adress += 129;
+          }
+          else
+          {
+            actual_notes.adress += 9+11+129;
+            
+          }
+      }
+      else
+      {
+          actual_notes.adress += 9+9+11+129;
+      }
+    }
+
+}
+
+
+
 
 #endif	/* NOTES_GESTION_H */
 

@@ -33,6 +33,7 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 #include "Timer1.h"
 #include "Gestion_Chauffage.h"
 #include "Gestion_Porte.h"
+#include "Notes_Gestion.h"
 
 //Definitions
 #define UART
@@ -161,11 +162,10 @@ int main(int argc, char** argv)
      
     Init_module();
 
-    
-    int  mon_adresse[3]={0x04,0x03,0x02};
-    char mon_adresse_b[3];
-    char datac;
-    int  data = 0x55223311;
+
+    char p_subject [9];
+    char p_user[9];
+    char p_date[11];
     
     float value;
 
@@ -255,6 +255,39 @@ int main(int argc, char** argv)
               putsU3("La led 5 est éteinte\n\r");
               break;
             }
+
+            
+            case 6:
+            {
+              int temp;
+              //Command to check if the user have send the right pin code
+              sscanf(function,"%d",&temp);
+              OpenDoor(temp);
+              break;
+            }
+
+            case 7:
+            {
+              int temp;
+              //Pour set le code pin de la porte
+              sscanf(function,"%d",&temp);
+              SetDoorCode(temp);
+              break;
+            }
+
+            case 81:
+            {
+              int temp;
+              //Command to check if the user have send the right pin code
+              sscanf(function,"%d",&temp);
+              CheckDoorPassword(temp);
+              break;
+            }
+
+
+
+
+
 
             case 10:
             {
@@ -383,31 +416,44 @@ int main(int argc, char** argv)
                 break;
             }
 
-            case 80:
+
+            case 90:
             {
-              int temp;
-              //Pour set le code pin de la porte
-              sscanf(function,"%d",&temp);
-              SetDoorCode(temp);
-              break;
+                //Initialisation
+                InitNote();
+                break;
             }
 
-            case 81:
+            case 91:
             {
-              int temp;
-              //Command to check if the user have send the right pin code
-              sscanf(function,"%d",&temp);
-              CheckDoorPassword(temp);
-              break;
+                //Fonction d'ajout d'une note
+                sscanf(function,"%s,%s,%s,%s",p_subject,buffer2,p_user,p_date);
+                AddNote(p_subject,buffer2,p_user,p_date);
+                break;
             }
 
-            case 82:
+            case 92:
             {
-              int temp;
-              //Command to check if the user have send the right pin code
-              sscanf(function,"%d",&temp);
-              OpenDoor(temp);
-              break;
+                //Fonction de suppresion d'une note
+                sscanf(function,"%s,%s,%s,%s",p_subject,buffer2,p_user,p_date);
+                DeleteNote(p_subject,buffer2,p_user,p_date);
+                break;
+            }
+
+            case 93:
+            {
+                //Fonction de lecture d'une note
+                sscanf(function,"%s,%s",p_subject,p_user);
+                ReadNote(p_subject,p_user);
+                break;
+            }
+
+            case 94:
+            {
+              //Fonction de lecture d'une note
+              sscanf(function,"%s",p_user);
+              ReadPersonnalNotes(p_user);
+              break;    
             }
 
             case 230:
@@ -586,11 +632,17 @@ void __ISR(_TIMER_23_VECTOR,ipl2) IntTimer23Handler(void)
 }
 
 // Interruption appelée par le capeur de mouvement. (Pin 3)
-void __ISR( _EXTERNAL_0_VECTOR, ipl1) INT0Handler( void)//_EXTERNAL_0_VECTOR est le vecteur pour le capteur de mouvement  //ipl7 est le niveau de priorité le plus haut: le premier à être servi.
+//_EXTERNAL_0_VECTOR est le vecteur pour le capteur de mouvement
+// ipl7 est le niveau de priorité le plus haut: le premier à être servi.
+void __ISR( _EXTERNAL_0_VECTOR, ipl1) INT0Handler( void)
 {
     //Mettre ici ce qu'on fait lorsque le capteur de mouvement capte quelquechose.
 
     mINT0ClearIntFlag();// clear the flag and exit
 } // Interrupt Handler
-//cette interrupt doit se désactiver et lancer un timer qui la réactive. c'est nécéssaire pour ignorer les fronts montant lors de la fois du signal du capteur de mouvement et aussi pour laisser le temps à la caméra de transmettre son image avant de devoir en prendre une nouvelle.
+
+/*cette interrupt doit se désactiver et lancer un timer qui la réactive.
+ * c'est nécéssaire pour ignorer les fronts montant lors de la fois
+ * du signal du capteur de mouvement et aussi pour laisser le temps à
+ * la caméra de transmettre son image avant de devoir en prendre une nouvelle.*/
 

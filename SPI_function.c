@@ -291,7 +291,7 @@ unsigned int READ_cmd_32(unsigned char addr_tab[])
     return ( i);
 }// readSEE
 
-void WRITE_cmd_n (unsigned char addr_tab[],unsigned char data[],unsigned char n)
+void WRITE_cmd_n (unsigned char addr_tab[],unsigned char data[],unsigned int n)
 {
     char i;
     while (RDSR_cmd() & 0x1){} // check the WIP flag
@@ -314,7 +314,7 @@ void WRITE_cmd_n (unsigned char addr_tab[],unsigned char data[],unsigned char n)
     CS = 1;
 }
 
-void READ_cmd_n(unsigned char addr_tab[],unsigned char data[],unsigned char n)
+void READ_cmd_n(unsigned char addr_tab[],unsigned char data[],unsigned int n)
 {
     // read a 32-bit value starting at an even address
     char i;
@@ -339,7 +339,7 @@ void READ_cmd_n(unsigned char addr_tab[],unsigned char data[],unsigned char n)
 }// readSEE
 
 
-int READ_string(unsigned char addr_tab[],unsigned char* data,unsigned char n)
+int READ_string(unsigned char addr_tab[],unsigned char* data,unsigned int n)
 {
     // read a 32-bit value starting at an even address
     int i;
