@@ -89,6 +89,7 @@ union myadress end_log;
 
 //Pointeur sur le début et la fin des notes
 union myadress begin_notes;
+union myadress actual_notes;
 union myadress end_notes;
 
 

@@ -101,7 +101,8 @@ extern unsigned char isLogged;
 
 //Variables globales
 union myadress var;
-int count=1;
+int count  = 1;
+int count2 = 1;
 char buffer2           [BUFFER_SIZE];
 
 //Définitions Hardware
@@ -130,7 +131,11 @@ void Init_module (void)
   //Configure Timer 1 Interrupt
   ConfigIntTimer1(T1_INT_ON | T1_INT_PRIOR_2);
 
-  // Enable      multi-vector interrupts
+  //Configure Timer 23 Interrupt
+  ConfigIntTimer23(T23_INT_ON | T23_INT_PRIOR_2);
+
+
+  // Enable multi-vector interrupts
   INTConfigureSystem(INT_SYSTEM_CONFIG_MULT_VECTOR);
   INTEnableInterrupts();
 
@@ -540,6 +545,7 @@ void __ISR(_UART2_VECTOR, ipl3) IntUart2Handler(void)
 	}
 }
 
+
 //TIMER 1 Interrupt Handler,set at priotity level 2
 void __ISR (_TIMER_1_VECTOR,ipl2) IntTimer1Handler(void)
 {
@@ -560,5 +566,11 @@ void __ISR (_TIMER_1_VECTOR,ipl2) IntTimer1Handler(void)
         mT1ClearIntFlag();
     }
 
+}
+
+//Timer 23 Interrupt Handler,set at priority level 2
+void __ISR(_TIMER_23_VECTOR,ipl2) IntTimer23Handler(void)
+{
+ 
 }
 
