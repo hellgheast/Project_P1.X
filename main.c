@@ -291,7 +291,7 @@ int main(int argc, char** argv)
 
             case 10:
             {
-              float temp = read_kty_81_220();
+              float temp = read_kty_81_220(0); //0 pour température intérieure.
               sprintf(buffer,"la température actuelle est de %f °C",temp);
               putsU3(buffer);
               break;
