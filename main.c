@@ -125,7 +125,7 @@ void Init_module (void)
 
   // Configure UART RX Interrupt
   INTEnable(INT_SOURCE_UART_RX(UART_MODULE_ID),INT_ENABLED);
-  INTSetVectorPriority(INT_VECTOR_UART(UART_MODULE_ID),INT_PRIORITY_LEVEL_3);
+  INTSetVectorPriority(INT_VECTOR_UART(UART_MODULE_ID),INT_PRIORITY_LEVEL_4);
 
 
   //Configure Timer 1 Interrupt
@@ -504,7 +504,7 @@ int main(int argc, char** argv)
  }
 
 // UART 2 interrupt handler, set at priority level 3
-void __ISR(_UART2_VECTOR, ipl3) IntUart2Handler(void)
+void __ISR(_UART2_VECTOR, ipl4) IntUart2Handler(void)
 {
 	// Is this an RX interrupt?
 	if(INTGetFlag(INT_SOURCE_UART_RX(UART3A)))
@@ -549,8 +549,6 @@ void __ISR(_UART2_VECTOR, ipl3) IntUart2Handler(void)
 //TIMER 1 Interrupt Handler,set at priotity level 2
 void __ISR (_TIMER_1_VECTOR,ipl2) IntTimer1Handler(void)
 {
-    
-
     if(count>643)// test effectué 643 fois -> 643 fois sec = 300 sec
         //2.145 fois permet d'avoir une seconde.
     {
