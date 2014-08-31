@@ -309,6 +309,58 @@ void ReadPersonnalNotes(char* user)
 
 }
 
+//Fonction pour lire les notes personelles
+void ReadPublicNotes(void)
+{
+    unsigned char cnt;
+    unsigned char get_subject [9];
+    unsigned char get_buffer [256];
+
+    //Lecture des pointeurs et des informations concernant les notes
+    Read_notes_pointer();
+
+    //On commence par le débt de la chaine
+    actual_notes.adress = begin_notes.adress;
+
+    for (cnt=0;cnt<notes_count;cnt++)
+    {
+      READ_cmd_n(actual_notes.nb,get_subject,9);
+      if (strcmp(get_subject,"********")!=0)
+      {
+          actual_notes.adress += 9;
+          READ_cmd_n(actual_notes.nb,get_buffer,9);
+
+          if(strcmp(get_buffer,user)==0)
+          {
+              printf("SUBJECT : %s\n",get_subject);
+              memset(get_subject,0,9);
+
+              printf("DESTINATAIRE : %s\n",get_buffer);
+
+              actual_notes.adress += 9;
+              READ_cmd_n(actual_notes.nb,get_buffer,11);
+              printf("DATE : %s\n",get_buffer);
+
+              actual_notes.adress += 11;
+              READ_string(actual_notes.nb,get_buffer,256);
+              printf("TEXTE : %s\n",get_buffer);
+
+              actual_notes.adress += 129;
+          }
+          else
+          {
+            actual_notes.adress += 9+11+129;
+
+          }
+      }
+      else
+      {
+          actual_notes.adress += 9+9+11+129;
+      }
+    }
+
+}
+
 
 
 
