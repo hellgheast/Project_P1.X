@@ -134,6 +134,10 @@ void Init_module (void)
   //Configure Timer 23 Interrupt
   ConfigIntTimer23(T23_INT_ON | T23_INT_PRIOR_2);
 
+  //configure interrupt capteur de mouvement.
+  mINT0SetIntPriority(1); //On set la priorité de l'interrupt du capteur de mouvement.
+  mINT0IntEnable(0); //On s'assure que l'interrupt du capteur de mouvement est désactivée au démarrage.
+  INTCONbits.INT0EP = 1; // L'interrupt du capteur de mouvement s'activera lors des fronts montants uniquement.
 
   // Enable multi-vector interrupts
   INTConfigureSystem(INT_SYSTEM_CONFIG_MULT_VECTOR);
@@ -569,6 +573,24 @@ void __ISR (_TIMER_1_VECTOR,ipl2) IntTimer1Handler(void)
 //Timer 23 Interrupt Handler,set at priority level 2
 void __ISR(_TIMER_23_VECTOR,ipl2) IntTimer23Handler(void)
 {
- 
+    if(count2 > 45)
+    {
+        mINT0IntEnable(1); //On active l'interrupt du capteur de mouvement.
+        mT23IntEnable(0); //On désactive l'interrupt du timer 23.
+    }
+    else
+    {
+        count2++;
+    }
+    mT23ClearIntFlag();
 }
+
+// Interruption appelée par le capeur de mouvement. (Pin 3)
+void __ISR( _EXTERNAL_0_VECTOR, ipl1) INT0Handler( void)//_EXTERNAL_0_VECTOR est le vecteur pour le capteur de mouvement  //ipl7 est le niveau de priorité le plus haut: le premier à être servi.
+{
+    //Mettre ici ce qu'on fait lorsque le capteur de mouvement capte quelquechose.
+
+    mINT0ClearIntFlag();// clear the flag and exit
+} // Interrupt Handler
+//cette interrupt doit se désactiver et lancer un timer qui la réactive. c'est nécéssaire pour ignorer les fronts montant lors de la fois du signal du capteur de mouvement et aussi pour laisser le temps à la caméra de transmettre son image avant de devoir en prendre une nouvelle.
 
