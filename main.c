@@ -135,6 +135,9 @@ void Init_module (void)
   //Configure Timer 23 Interrupt
   ConfigIntTimer23(T23_INT_ON | T23_INT_PRIOR_2);
 
+  //Configure Timer 45 Interrupt
+  ConfigIntTimer45(T45_INT_ON | T45_INT_PRIOR_2);
+
   //configure interrupt capteur de mouvement.
   mINT0SetIntPriority(1); //On set la priorité de l'interrupt du capteur de mouvement.
   mINT0IntEnable(0); //On s'assure que l'interrupt du capteur de mouvement est désactivée au démarrage.
@@ -548,7 +551,7 @@ int main(int argc, char** argv)
     
 #endif
             
-    void gestion_chauffage(22); //La température demandée est une constante pour l'instant
+    gestion_chauffage(22); //La température demandée est une constante pour l'instant
            
  }
 
@@ -645,3 +648,11 @@ void __ISR( _EXTERNAL_0_VECTOR, ipl1) INT0Handler( void)
  * du signal du capteur de mouvement et aussi pour laisser le temps à
  * la caméra de transmettre son image avant de devoir en prendre une nouvelle.*/
 
+
+//Timer 45 Interrupt Handler,set at priority level 2
+void __ISR(_TIMER_45_VECTOR,ipl2) IntTimer45Handler(void)
+{
+
+
+    mT45ClearIntFlag();
+}

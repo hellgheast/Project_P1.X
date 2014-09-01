@@ -67,9 +67,18 @@ void gestion_chauffage(int consigne_temp)
     ext_temp = read_kty_81_220(2);
     lum = read_TL250();
 
+    int erreur = consigne_temp - int_temp;
 
+    if(erreur > 4)
+    {
+        chauffage = 4096;
+    }
+    else
+    {
+        
+    }
 
-    void ChangePWM (chauffage);
+    ChangePWM (chauffage);
 }
 
 #endif	/* PWM_H */
