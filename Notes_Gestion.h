@@ -6,7 +6,7 @@ Compilateur  : MPLAB X
 Date         : 7. Août 2014
 Version      : 2.05
 ---------------------------------------------------------------------
-Description  : Librairie de fonctionnement de gestion des utilisateurs
+Description  : Librairie de fonctionnement de gestion des notes
 --------------------------Modifications------------------------------
 Version      : 1.2
 Modification : Mise en place du compteur d'utilisateur
@@ -43,7 +43,7 @@ void AddNote (char* subject,char* text,char* p_user,char* date);
 void DeleteNote (char* subject,char* text,char* p_user,char* date);
 void ReadNote (char* subject,char*user);
 
-void ReadPublicNotes (char* user);
+void ReadPublicNotes ();
 void ReadPersonnalNotes (char* user);
 
 void Read_notes_pointer(void);
