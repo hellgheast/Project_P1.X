@@ -68,7 +68,7 @@ void gestion_chauffage(int consigne_temp)
     ext_temp = read_kty_81_220(2);
     lum = read_TL250();
 
-    int erreur = consigne_temp - int_temp;
+    float erreur = (consigne_temp-lum/200.0) - int_temp; //calcul de l'erreur et diminution de la consigne selon la luminosité
 
     if(erreur > 4.0)
     {
@@ -76,10 +76,21 @@ void gestion_chauffage(int consigne_temp)
     }
     else
     {
-        chauffage = Kp * erreur; //régulation p
+        chauffage = Kp * erreur + (int_temp-ext_temp)*10; //régulation p et prise en compte de la température extérieure.
     }
 
-    ChangePWM (chauffage);
+    if(chauffage <= 1024 && chauffage >=0) //test de sécurité pour éviter les problèmes.
+    {
+        ChangePWM (chauffage);
+    }
+    else if(chauffage < 0)
+    {
+         ChangePWM (0);
+    }
+    else
+    {
+         ChangePWM (1024);
+    }
 }
 
 #endif	/* PWM_H */
