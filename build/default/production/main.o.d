@@ -10,4 +10,5 @@ User_Gestion.h  \
  Bluetooth_Module.h  \
 Timer1.h  \
 Gestion_Chauffage.h  \
-Gestion_Porte.h 
+Gestion_Porte.h  \
+ Notes_Gestion.h 
