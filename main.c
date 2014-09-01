@@ -621,15 +621,7 @@ void __ISR (_TIMER_1_VECTOR,ipl2) IntTimer1Handler(void)
 //Timer 23 Interrupt Handler,set at priority level 2
 void __ISR(_TIMER_23_VECTOR,ipl2) IntTimer23Handler(void)
 {
-    if(count2 > 45)
-    {
-        mINT0IntEnable(1); //On active l'interrupt du capteur de mouvement.
-        mT23IntEnable(0); //On désactive l'interrupt du timer 23.
-    }
-    else
-    {
-        count2++;
-    }
+
     mT23ClearIntFlag();
 }
 
@@ -652,7 +644,14 @@ void __ISR( _EXTERNAL_0_VECTOR, ipl1) INT0Handler( void)
 //Timer 45 Interrupt Handler,set at priority level 2
 void __ISR(_TIMER_45_VECTOR,ipl2) IntTimer45Handler(void)
 {
-
-
+    if(count2 > 45)
+    {
+        mINT0IntEnable(1); //On active l'interrupt du capteur de mouvement.
+        mT45IntEnable(0); //On désactive l'interrupt du timer 45.
+    }
+    else
+    {
+        count2++;
+    }
     mT45ClearIntFlag();
 }
