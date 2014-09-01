@@ -551,7 +551,7 @@ int main(int argc, char** argv)
     
 #endif
             
-    gestion_chauffage(22); //La température demandée est une constante pour l'instant
+    gestion_chauffage(22); //La température demandée est une constante pour l'instant.
            
  }
 
