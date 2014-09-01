@@ -20,6 +20,7 @@ Modification : Version Initiale
 void Regulation (void);
 void InitPWM (void);
 void ChangePWM (int param);
+void gestion_chauffage(int);
 
 void InitPWM()
 {
@@ -55,6 +56,21 @@ void ChangePWM (int param)
 
 }
 
+void gestion_chauffage(int consigne_temp)
+{
+    float int_temp;
+    float ext_temp;
+    float lum;
+    int chauffage;
+
+    int_temp = read_kty_81_220(0);
+    ext_temp = read_kty_81_220(2);
+    lum = read_TL250();
+
+
+
+    void ChangePWM (chauffage);
+}
 
 #endif	/* PWM_H */
 
