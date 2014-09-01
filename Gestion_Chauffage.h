@@ -16,6 +16,7 @@ Modification : Version Initiale
 
 #ifndef PWM_H
 #define	PWM_H
+#define Kp 256 //Lorsque erreur est inférieure à 4 degrés, on chauffe à 100%, Kp doit donner 1024 lorsque l'on est à 4 degrés.
 
 void Regulation (void);
 void InitPWM (void);
@@ -69,13 +70,13 @@ void gestion_chauffage(int consigne_temp)
 
     int erreur = consigne_temp - int_temp;
 
-    if(erreur > 4)
+    if(erreur > 4.0)
     {
         chauffage = 4096;
     }
     else
     {
-        
+        chauffage = Kp * erreur; //régulation p
     }
 
     ChangePWM (chauffage);
