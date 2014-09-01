@@ -40,7 +40,7 @@ unsigned char notes_count;
 
 //Prototypes de fonctions
 void AddNote (char* subject,char* text,char* p_user,char* date);
-void DeleteNote (char* subject,char* text,char* p_user,char* date);
+void DeleteNote (char* subject,char* p_user);
 void ReadNote (char* subject,char*user);
 
 void ReadPublicNotes ();
@@ -179,7 +179,7 @@ void AddNote (char* subject,char* text,char* p_user,char* date)
     Write_notes_pointer();
 }
 
-void DeleteNote (char* subject,char* text,char* p_user,char* date)
+void DeleteNote (char* subject,char* p_user)
 {
     //Variables
     char get_buffer[64];
@@ -194,11 +194,22 @@ void DeleteNote (char* subject,char* text,char* p_user,char* date)
       READ_cmd_n(actual_notes.nb,get_buffer,9); // Check if the subject is right.
       if(strcmp(subject,get_buffer)== 0)
       {
-        notes_count--;
-        WRITE_cmd_n(actual_notes.nb,"********",9);
-        Write_notes_pointer();
-
-        cnt = notes_count+1;
+        actual_notes.adress += 9;
+        READ_cmd_n(actual_notes.nb,get_buffer,9); // Check if the user is right.
+        if(strcmp(p_user,get_buffer)==0)
+        {
+          notes_count--;
+          actual_notes.adress-=9;
+          WRITE_cmd_n(actual_notes.nb,"********",9);
+          Write_notes_pointer();
+          cnt = notes_count+1;
+        }
+        
+        else
+        {
+             cnt++;
+             actual_notes.adress += 9 + 11 + 129;
+        }
       }
 
       else
@@ -330,7 +341,7 @@ void ReadPublicNotes(void)
           actual_notes.adress += 9;
           READ_cmd_n(actual_notes.nb,get_buffer,9);
 
-          if(strcmp(get_buffer,user)==0)
+          if(strcmp(get_buffer,"PUBLIC**")==0)
           {
               printf("SUBJECT : %s\n",get_subject);
               memset(get_subject,0,9);

@@ -132,9 +132,6 @@ void Init_module (void)
   //Configure Timer 1 Interrupt
   ConfigIntTimer1(T1_INT_ON | T1_INT_PRIOR_2);
 
-  //Configure Timer 23 Interrupt
-  ConfigIntTimer23(T23_INT_ON | T23_INT_PRIOR_2);
-
   //Configure Timer 45 Interrupt
   ConfigIntTimer45(T45_INT_ON | T45_INT_PRIOR_2);
 
@@ -438,8 +435,8 @@ int main(int argc, char** argv)
             case 92:
             {
                 //Fonction de suppresion d'une note
-                sscanf(function,"%s,%s,%s,%s",p_subject,buffer2,p_user,p_date);
-                DeleteNote(p_subject,buffer2,p_user,p_date);
+                sscanf(function,"%s,%s",p_subject,p_user);
+                DeleteNote(p_subject,p_user);
                 break;
             }
 
@@ -618,12 +615,6 @@ void __ISR (_TIMER_1_VECTOR,ipl2) IntTimer1Handler(void)
 
 }
 
-//Timer 23 Interrupt Handler,set at priority level 2
-void __ISR(_TIMER_23_VECTOR,ipl2) IntTimer23Handler(void)
-{
-
-    mT23ClearIntFlag();
-}
 
 // Interruption appelée par le capeur de mouvement. (Pin 3)
 //_EXTERNAL_0_VECTOR est le vecteur pour le capteur de mouvement

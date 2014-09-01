@@ -25,15 +25,11 @@ void gestion_chauffage(int);
 
 void InitPWM()
 {
-    OpenOC1( OC_ON | OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE, 2048, 2048);
-    OpenTimer2( T2_ON | T2_PS_1_8 | T2_SOURCE_INT, 4096);
-    /*
-    T2CONCLR = T2_ON;        // Turn the timer off
-    T2CON = T2_PS_1_8;        // Set prescaler
-    TMR2 = 0;                 // Clear the counter
-    PR2 = 4096;               // Set the period
-    T2CONSET = T2_ON;         // Turn the timer on
-     */
+
+    CloseOC3();
+    OpenTimer2( T2_ON | T2_PS_1_2 | T2_SOURCE_INT, 1024);
+    OpenOC3( OC_ON | OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE, 0, 0);
+    SetDCOC3PWM(512);
 }
 void function_ (void)
 {
@@ -48,11 +44,11 @@ void ChangePWM (int param)
 {
     if(param > PR2)
     {
-      SetDCOC1PWM(2048);
+      SetDCOC3PWM(512);
     }
     else
     {
-      SetDCOC1PWM(param);
+      SetDCOC3PWM(param);
     }
 
 }

@@ -3,21 +3,25 @@ Fichier      : S25FL512S
 ---------------------------------------------------------------------
 Auteur       : ISMAIL BEN SALAH
 Compilateur  : MPLAB X
-Date         : 15 août 2014
-Version      : 2.05
+Date         : 1 septembre 2014
+Version      : 2.15
 ---------------------------------------------------------------------
 Description  : Librairie de fonctionnement de la flash SPANSION S25FL512S
 --------------------------Modifications------------------------------
-Version      : 1.0
-Modification : Version initiale<
+Version      : 1.2
+Modification : Implémentation des fonctions d'effacement
 *********************************************************************/
 
 #ifndef S25FL512S_H
 #define	S25FL512S_H
 
+#include "SPI_function.h"
+
+
 
 //Définitions Hardware
-
+#define CS_FLASH PORTEbits.RE3
+#define CS_FLASH_IO TRISEbits.TRISE3
 
 //Liste des commandes disponibles
 #define REMS        0x90    //Read Electronic Manufacturer Signature
@@ -102,14 +106,154 @@ Modification : Version initiale<
 #define MBR         0xFF    //Mode Bit Reset
 
 //Fonctions
+void InitFlash (void);
 void Write_Enable(void);
+unsigned char RDSR1_cmd (void);
+unsigned char RDSR2_cmd (void);
+
+void READ_Flash_cmd_n(char addr_tab[],char get_tab[],int size_data);
+void WRITE_Flash_cmd_n(char addr_tab[],char data_tab[],int size_data);
+
+void Flash_Erase (void);
+void Sector_Erase (char addr_tab[]);
 
 
 void Write_Enable (void)
 {
-  //CS
-  
+    CS_FLASH = 0;
+    writeSPI2(WREN);
+    CS_FLASH = 1;
 }
+
+void InitFlash (void)
+{
+    CS_FLASH_IO = 0;
+}
+
+unsigned char RDSR1_cmd (void)
+{
+    unsigned char reg;
+    CS_FLASH = 0;
+    reg = writeSPI2(RDSR1);
+    CS_FLASH = 1;
+    return reg;
+}
+
+
+unsigned char RDSR2_cmd (void)
+{
+  unsigned char reg;
+
+  CS_FLASH = 0;
+  reg = writeSPI2(RDSR2);
+  CS_FLASH = 1;
+  return reg;
+}
+
+
+
+void READ_Flash_cmd_n(char addr_tab[],char get_tab[],int size_data)
+{
+    int i;
+
+    //Check if the flash if not working
+    while(RDSR1_cmd() & 0x01){}
+
+    //Lecture Phase
+    CS_FLASH = 0;
+
+    writeSPI2(READ_4);
+
+    //Send the adress
+    writeSPI2(addr_tab[3]);
+    writeSPI2(addr_tab[2]);
+    writeSPI2(addr_tab[1]);
+    writeSPI2(addr_tab[0]);
+
+    for(i = 0;i<size_data;i++)
+    {
+        get_tab[i] = writeSPI2(0xFF);
+    }
+
+    CS_FLASH = 1;
+}
+
+void WRITE_Flash_cmd_n(char addr_tab[],char data_tab[],int size_data)
+{
+
+       int i;
+
+    //Check if the flash if not working
+    while(RDSR1_cmd() & 0x01){}
+
+
+    //Set the Write Enable
+    Write_Enable();
+
+    //Lecture Phase
+    CS_FLASH = 0;
+
+
+    writeSPI2(PP_4);
+
+    //Send the adress
+    writeSPI2(addr_tab[3]);
+    writeSPI2(addr_tab[2]);
+    writeSPI2(addr_tab[1]);
+    writeSPI2(addr_tab[0]);
+
+    for(i = 0;i<size_data;i++)
+    {
+      writeSPI2(data_tab[i]);
+    }
+
+    CS_FLASH = 1;
+
+}
+
+//Command to erase all the flash
+void Flash_Erase (void)
+{
+
+    //Set the Write Enable
+    Write_Enable();
+
+    CS_FLASH = 0;
+
+    //Bulk Erase to erase all the flash
+    writeSPI2(BE);
+
+    CS_FLASH = 1;
+
+    //Check if the flash if not working
+    while(RDSR1_cmd() & 0x01){}
+
+}
+
+void Sector_Erase (char addr_tab[])
+{
+
+     //Set the Write Enable
+    Write_Enable();
+
+    CS_FLASH = 0;
+
+    //Send the command to erase à sector of 256 byte
+    writeSPI2(SE_4);
+
+    //Send the adress of the sector
+    writeSPI2(addr_tab[3]);
+    writeSPI2(addr_tab[2]);
+    writeSPI2(addr_tab[1]);
+    writeSPI2(addr_tab[0]);
+
+    CS_FLASH = 1;
+    
+    //Check if the flash if not working
+    while(RDSR1_cmd() & 0x01){}
+
+}
+
 
 
 #endif	/* S25FL512S_H */
