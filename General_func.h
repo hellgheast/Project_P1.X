@@ -92,6 +92,10 @@ union myadress begin_notes;
 union myadress actual_notes;
 union myadress end_notes;
 
+//Pointeur sur le début et la fin des mesures des tenpératures
+union myadress begin_temperature;
+union myadress actual_temperature;
+union myadress end_temperature;
 
 //Variables gloabes
 char buffer     [BUFFER_SIZE];
