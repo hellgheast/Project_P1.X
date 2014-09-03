@@ -38,9 +38,9 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 //Definitions
 #define UART
 #define BUFFER_SIZE 128
-#define DEBUG
+#undef DEBUG
 
-#define MODULE2
+#undef MODULE2
 
 
 #define CREATEUSER          0
@@ -92,7 +92,7 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 #define INITCHAUFFAGE       100
 #define SETCHAUFFAGETEMP    101
 #define GETCHAUFFAGEHISTORY 102
-#define DISCONNECT          230
+#define DISCONNECT          236
 
 //Prototypes de fonctions
 void WriteByte  (void);
@@ -539,9 +539,7 @@ int main(int argc, char** argv)
 
             case DISCONNECT:
             {
-                SetCommandMode();
-                Disconnect();
-                QuitCommandMode();
+                isLogged = 0;
                 break;
             }
 

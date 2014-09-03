@@ -135,6 +135,8 @@ void AddNote (char* subject,char* text,char* p_user,char* date)
     strcpy(NotetoSend.Date,date);
     strcpy(NotetoSend.Text,text);
 
+
+
     //Lecture des pointeurs et des informations concernant les notes
     Read_notes_pointer();
 

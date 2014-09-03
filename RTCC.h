@@ -37,12 +37,12 @@ void RTCCInit(void)
 
         tm.l    = 0;
         tm.sec  = 0x00;
-        tm.min  = 0x36;
-        tm.hour = 0x10;
+        tm.min  = 0x00;
+        tm.hour = 0x08;
 
-        dt.wday = 1;
-        dt.mday = 0x18;
-        dt.mon  = 0x08;
+        dt.wday = 2;
+        dt.mday = 0x03;
+        dt.mon  = 0x09;
         dt.year = 0x14;
         RtccSetTimeDate(tm.l, dt.l);
         RtccEnable();

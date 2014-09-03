@@ -248,15 +248,17 @@ void GetUsers   (void)
 
   Read_log_adress();
 
+  printf("USERS:\n");
+  
   for(actual_log.adress = begin_log.adress,cnt=0;cnt<user_count;actual_log.adress += 9,cnt++ )
     {
 
         READ_string(actual_log.nb,get_buffer,64);
-        sprintf(buffer,"USER : %s\n",get_buffer);
+        sprintf(buffer,"%s,",get_buffer);
         putsU3(buffer);
         actual_log.adress += 9;
         READ_string(actual_log.nb,get_buffer,64);
-        sprintf(buffer,"PASSWORD : %s\n",get_buffer);
+        sprintf(buffer,"%s\n",get_buffer);
         putsU3(buffer);
     }
 }
