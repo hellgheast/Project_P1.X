@@ -25,7 +25,7 @@ Modification : Version Initiale
 void Regulation (void);
 void InitPWM (void);
 void ChangePWM (int param);
-void gestion_chauffage(int);
+void gestion_chauffage(float);
 
 void Init_Gestion_Chauffage(void);
 void Read_temperature_pointer(void);
@@ -68,7 +68,7 @@ void Read_temperature_pointer(void)
 {
     union myadress temp;
 
-    temp.adress=0x0011;
+    temp.adress=0x0015;
     READ_cmd_n(temp.nb,begin_temperature.nb,3);
     printf("BEGIN : %d \n",begin_temperature.adress);
 
@@ -180,7 +180,7 @@ void ChangePWM (int param)
 
 }
 
-void gestion_chauffage(int consigne_temp)
+void gestion_chauffage(float consigne_temp)
 {
     float int_temp;
     float ext_temp;
