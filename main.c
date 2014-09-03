@@ -135,7 +135,7 @@ void Init_module (void)
   ConfigIntTimer1(T1_INT_ON | T1_INT_PRIOR_2);
 
   //Configure Timer 45 Interrupt
-  ConfigIntTimer45(T45_INT_ON | T45_INT_PRIOR_2);
+  ConfigIntTimer45(T45_INT_ON | T45_INT_PRIOR_3);
 
   //configure interrupt capteur de mouvement.
   mINT0SetIntPriority(1); //On set la priorité de l'interrupt du capteur de mouvement.
@@ -587,31 +587,33 @@ void __ISR (_TIMER_1_VECTOR,ipl2) IntTimer1Handler(void)
 // Interruption appelée par le capeur de mouvement. (Pin 3)
 //_EXTERNAL_0_VECTOR est le vecteur pour le capteur de mouvement
 // ipl7 est le niveau de priorité le plus haut: le premier à être servi.
-void __ISR( _EXTERNAL_0_VECTOR, ipl1) INT0Handler( void)
-{
-    //Mettre ici ce qu'on fait lorsque le capteur de mouvement capte quelquechose.
-
-    mINT0ClearIntFlag();// clear the flag and exit
-} // Interrupt Handler
-
-/*cette interrupt doit se désactiver et lancer un timer qui la réactive.
- * c'est nécéssaire pour ignorer les fronts montant lors de la fois
- * du signal du capteur de mouvement et aussi pour laisser le temps à
- * la caméra de transmettre son image avant de devoir en prendre une nouvelle.*/
-
-
-//Timer 45 Interrupt Handler,set at priority level 2
-void __ISR(_TIMER_45_VECTOR,ipl2) IntTimer45Handler(void)
+/*void __ISR(_TIMER_45_VECTOR,ipl2) IntTimer45Handler(void)
 {
     if(count2 > 45)
     {
         mINT0IntEnable(1); //On active l'interrupt du capteur de mouvement.
         mT45IntEnable(0); //On désactive l'interrupt du timer 45.
+        mT45SetIntPriority(3);
+        mT45IntEnable(1);
     }
     else
     {
         count2++;
     }
     mT45ClearIntFlag();
-}
+}*/
 
+//Timer 45 Interrupt Handler,set at priority level 3
+void __ISR(_TIMER_45_VECTOR,ipl3) IntTimer45Handler(void)
+{
+    if(count3>10)
+    {
+        Add_temperature();
+        count3 = 1;
+    }
+    else
+    {
+        count3++;
+    }
+    mT45ClearIntFlag();
+}
