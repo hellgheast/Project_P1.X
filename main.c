@@ -38,43 +38,61 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 //Definitions
 #define UART
 #define BUFFER_SIZE 128
-#define DEBUG
+#undef DEBUG
 
-#define CHECKUSER 0
-#define LED4ON 1
-#define LED4OFF 2
-#define LED5ON 3
-#define LED5OFF 4
-#define CHECKPINCODE 5
-#define SETPINCODE 6
-#define ADDNOTE 7
-#define DELETENOTE 8
-#define READALLNOTE 9
-#define READPERSONALNOTE 10
-#define READPUBLICNOTE 11
-#define CHECKDOORPASSWORD 81
-#define READTEMP 82
-#define WRITEBYTE 20
-#define READBYTE 21
-#define FLOATWRITE 22
-#define FLOATREAD 23
+#undef MODULE2
+
+
+#define CREATEUSER          0
+#define CHECKLOGIN          1
+#define GETUSERS            2
+#define DELETEUSER          3
+#define ADMIN_ADD_USER      4
+#define MODIFYPASSWORD      5
+#define MODIFYUSERNAME      6
+#define OPENDOOR            7
+#define CHANGEDOORPASS      8
+#define ADDNOTE             9
+#define DELETENOTE          10
+#define READALLNOTE         11
+#define READPERSONALNOTE    12
+#define READPUBLICNOTE      13
+#define ADD_SCHEDULING      14
+#define DELETE_SCHEDULING   15
+#define SETTEMPCONSIGN      16
+
+
+
+#define WRITEBYTE   20
+#define READBYTE    21
+#define FLOATWRITE  22
+#define FLOATREAD   23
 #define STRINGWRITE 24
-#define STRINGREAD 25
-#define CHIPERASE 26
-#define GETTIME 40
-#define GETUSERS 51
-#define READLOGADRESS 52
-#define ADDUSERS 53
-#define DELETEUSER 54
-#define MODIFYPASSWORD 55
-#define CHECKLOGIN 56
-#define MODIFYUSERNAME 57
-#define LISTINIT 70
-#define INITNOTE 90
-#define INITCHAUFFAGE 100
-#define SETCHAUFFAGETEMP 101
+#define STRINGREAD  25
+#define CHIPERASE   26
+
+
+#define CHECKUSER 30
+#define LED4ON    31
+#define LED4OFF   32
+#define LED5ON    33
+#define LED5OFF   34
+
+
+#define CHECKDOORPASSWORD 35
+#define READTEMP          36
+#define GETTIME           37
+
+#define READLOGADRESS     38
+
+
+
+#define LISTINIT            70
+#define INITNOTE            71
+#define INITCHAUFFAGE       100
+#define SETCHAUFFAGETEMP    101
 #define GETCHAUFFAGEHISTORY 102
-#define DISCONNECT 230
+#define DISCONNECT          230
 
 //Prototypes de fonctions
 void WriteByte  (void);
@@ -169,7 +187,7 @@ void Init_module (void)
   ConfigIntTimer1(T1_INT_ON | T1_INT_PRIOR_2);
 
   //Configure Timer 45 Interrupt
-  ConfigIntTimer45(T45_INT_ON | T45_INT_PRIOR_3);
+  //ConfigIntTimer45(T45_INT_ON | T45_INT_PRIOR_3);
 
   //configure interrupt capteur de mouvement.
   mINT0SetIntPriority(1); //On set la priorité de l'interrupt du capteur de mouvement.
@@ -202,6 +220,8 @@ int main(int argc, char** argv)
     char p_subject [9];
     char p_user[9];
     char p_date[11];
+    float p_temp;
+
     
     float value;
 
@@ -243,7 +263,7 @@ int main(int argc, char** argv)
       {
         switch (CMD)
         {
-            case 0:
+            case CREATEUSER:
             {
               //test du rajout d'utilisateur
               sscanf(function,"%s,%s",buffer2,password);
@@ -252,7 +272,7 @@ int main(int argc, char** argv)
               break;
             }
 
-            case 1:
+            case CHECKLOGIN:
             {
                 sscanf(function,"%s",password);
                 CheckLogin(user,password);
@@ -303,7 +323,7 @@ int main(int argc, char** argv)
             }
 
             
-            case CHECKPINCODE:
+            case OPENDOOR:
             {
               int temp;
               //Command to check if the user have send the right pin code
@@ -312,7 +332,7 @@ int main(int argc, char** argv)
               break;
             }
 
-            case SETPINCODE:
+            case CHANGEDOORPASS:
             {
               int temp;
               //Pour set le code pin de la porte
@@ -438,20 +458,16 @@ int main(int argc, char** argv)
               break;
             }
     
-            case READLOGADRESS:
-            {
-              Read_log_adress ();
-              break;
-            }
-
-            case ADDUSERS:
+            case ADMIN_ADD_USER:
             {
               //test du rajout d'utilisateur
               sscanf(function,"%s,%s",buffer2,password);
               //Ecriture du compte en mémoire
               AddUser(buffer2,password);
-              break;
+              break;  
             }
+
+           
 
             case DELETEUSER:
             {
@@ -510,7 +526,8 @@ int main(int argc, char** argv)
             }
             case SETCHAUFFAGETEMP:
             {
-                gestion_chauffage(22); //La température demandée est une constante pour l'instant.
+                //Fonction pour changer la consigne
+                sscanf(buffer,"%d",&p_temp);
             }
             case GETCHAUFFAGEHISTORY:
             {
@@ -535,41 +552,13 @@ int main(int argc, char** argv)
   }
 
 
+        #ifdef MODULE2
+               gestion_chauffage(p_temp); //La température demandée est une constante pour l'instant.
+        #endif
+    
 
-
-
-
-
-  
     }
 #endif
-#ifdef SPI
-
-        SPI2Init();
-        int i=0;
-        union myadress test ;
-        while(1)
-        {
-
-            for (i=0; i<0xfffff; i++);
-
-            
-            
-            test.adress = 0x300;
-            WRITE_cmd(test.nb,32);
-            test.adress += 9;
-            WRITE_cmd(test.nb,32);
-
-        }
-
-        SpiChnClose(2);
-#endif
-#ifdef TMP
-    
-#endif
-            
-
-           
  }
 
 // UART 2 interrupt handler, set at priority level 4
