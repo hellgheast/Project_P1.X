@@ -93,15 +93,19 @@ void Add_temperature(void)
     union myadress i;
     union myadress a;
 
-     RtccGetTimeDate(&mon_temps,&ma_date);
+   RtccGetTimeDate(&mon_temps,&ma_date);
 
     Time[0]=mon_temps.b[1];
     Time[1]=mon_temps.b[2];
     Time[2]=mon_temps.b[3];
 
+    printf("Date : %x%x-%x%x-%x%x \n",(0xF0&Time[0]),(0x0F&Time[0]),(0xF0&Time[1]),(0x0F&Time[1]),(0xF0&Time[2]),(0x0F&Time[2]));
+
     Date[0]=ma_date.b[1];
     Date[1]=ma_date.b[2];
     Date[2]=ma_date.b[3];
+
+     printf("Heure : %x%x-%x%x-%x%x \n",(0xF0&Date[0]),(0x0F&Date[0]),(0xF0&Date[1]),(0x0F&Date[1]),(0xF0&Date[2]),(0x0F&Date[2]));
 
     actual_temperature.adress=begin_temperature.adress;
 
@@ -141,20 +145,22 @@ void Get_Historique(void)
     char heure[3];
     char temp[4];
     union myadress i;
+    union myfloat value;
     actual_temperature.adress=begin_temperature.adress;
 
     READ_cmd_n(actual_temperature.nb,date,3);
     actual_temperature.adress+=3;
-    printf("Date : %s \n",date);
+    printf("Date : %x%x-%x%x-%x%x \n",(0xF0&date[0]),(0x0F&date[0]),(0xF0&date[1]),(0x0F&date[1]),(0xF0&date[2]),(0x0F&date[2]));
+
 
     READ_cmd_n(actual_temperature.nb,heure,3);
     actual_temperature.adress+=3;
-    printf("Heure : %s \n",heure);
+    printf("Heure : %x%x-%x%x-%x%x \n",(0xF0&heure[0]),(0x0F&heure[0]),(0xF0&heure[1]),(0x0F&heure[1]),(0xF0&heure[2]),(0x0F&heure[2]));
 
     for (i.adress=actual_temperature.adress;i.adress<=end_temperature.adress;i.adress+=4)
     {
-        READ_cmd_n(i.nb,temp,4);
-        printf("%s \n",temp);
+        READ_cmd_n(i.nb,value.nb,4);
+        printf("%f\n",value.f);
     }
 }
 

@@ -92,6 +92,7 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 #define INITCHAUFFAGE       100
 #define SETCHAUFFAGETEMP    101
 #define GETCHAUFFAGEHISTORY 102
+#define ADDCHAUFFAGETEMP    103
 #define DISCONNECT          236
 
 //Prototypes de fonctions
@@ -531,6 +532,13 @@ int main(int argc, char** argv)
                 sscanf(function,"%f",&p_temp);
                 break;
             }
+
+            case ADDCHAUFFAGETEMP:
+            {
+                Add_temperature();
+                break;
+            }
+
             case GETCHAUFFAGEHISTORY:
             {
                 Get_Historique();

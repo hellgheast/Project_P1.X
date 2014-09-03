@@ -201,14 +201,15 @@ int CheckLogin (char* p_user,char* p_password)
     char get_buffer[64];
     int cnt;
     Read_log_adress();
+    
+    printf("USER : %s\n",p_user);
+
 
     for(actual_log.adress = begin_log.adress,cnt=0;cnt<user_count;actual_log.adress += 18,cnt++ )
     {
         READ_string(actual_log.nb,get_buffer,64);
-        printf("USER : %s\n",p_user);
-        printf("GET : %s\n",get_buffer);
+        printf("%s\n",get_buffer);
 
-        
         if(strcmp(p_user,get_buffer)==0) //Si on trouve que le pseudo existe on retourne 1
         {
             actual_log.adress +=9;
@@ -254,11 +255,11 @@ void GetUsers   (void)
     {
 
         READ_string(actual_log.nb,get_buffer,64);
-        sprintf(buffer,"%s,",get_buffer);
-        putsU3(buffer);
+        sprintf(buffer,"%s",get_buffer);
+        putsU3NR(buffer);
         actual_log.adress += 9;
         READ_string(actual_log.nb,get_buffer,64);
-        sprintf(buffer,"%s\n",get_buffer);
+        sprintf(buffer,",%s\n",get_buffer);
         putsU3(buffer);
     }
 }
