@@ -40,6 +40,17 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 #define BUFFER_SIZE 128
 #define DEBUG
 
+#define Checkuser 0
+#define Led4On 1
+#define Led4Off 2
+#define Led5On 3
+#define Led5Off 4
+#define CheckPinCode 5
+#define SetPinCode 6
+#define AddNote 7
+#define DeleteNote 8
+#define ReadNoteAll 9
+#define ReadPersonalNote 10
 
 //Prototypes de fonctions
 void WriteByte  (void);
@@ -123,7 +134,6 @@ void Init_module (void)
   TimerInit();
   InitPWM();
   isLogged = 0;
-
   //Configuration des interrupts
 
   // Configure UART RX Interrupt
@@ -234,34 +244,34 @@ int main(int argc, char** argv)
     if(done==1 && isLogged == 1){
         switch (CMD)
         {
-            case 0:
+            case Checkuser:
             {
                 CheckLogin(user,password);
                 break;
             }
 
-            case 1:
+            case Led4On:
             {
               LED4 = 1;
               putsU3("La led 4 est allumée\n\r");
               break;
             }
 
-            case 2:
+            case Led4Off:
             {
               LED4 = 0;
               putsU3("La led 4 est éteinte\n\r");
               break;
             }
 
-            case 3:
+            case Led5On:
             {
               LED5 = 1;
               putsU3("La led 5 est allumée\n\r");
               break;
             }
 
-            case 4:
+            case Led5Off:
             {
               LED5 = 0;
               putsU3("La led 5 est éteinte\n\r");
@@ -269,7 +279,7 @@ int main(int argc, char** argv)
             }
 
             
-            case 5:
+            case CheckPinCode:
             {
               int temp;
               //Command to check if the user have send the right pin code
@@ -278,7 +288,7 @@ int main(int argc, char** argv)
               break;
             }
 
-            case 6:
+            case SetPinCode:
             {
               int temp;
               //Pour set le code pin de la porte
@@ -469,8 +479,19 @@ int main(int argc, char** argv)
                 InitNote();
                 break;
             }
-
-
+            case 100:
+            {
+                Init_Gestion_Chauffage();
+               
+            }
+            case 101:
+            {
+                gestion_chauffage(22); //La température demandée est une constante pour l'instant.
+            }
+            case 102:
+            {
+                Get_Historique();
+            }
 
             case 230:
             {
@@ -523,7 +544,7 @@ int main(int argc, char** argv)
     
 #endif
             
-    gestion_chauffage(22); //La température demandée est une constante pour l'instant.
+
            
  }
 
@@ -545,16 +566,15 @@ void __ISR(_UART2_VECTOR, ipl4) IntUart2Handler(void)
 
             if(U2STAbits.FERR == 0 && U2STAbits.PERR == 0 )
             {
-              //putU3('K');
+              putU3('K');
               getsU3(buffer,128);   //On récupère le message
               done=1;               //On indique qu'une transmission c'est faite
             }
-
             INTEnableInterrupts();  //On réactive les interrupts
             INTClearFlag(INT_SOURCE_UART_RX(UART3A)); // Clear the RX interrupt Flag
   
             sscanf(buffer,"%s,%d,%s",user,&CMD,function);
-
+            //printf("user : %s \n cmd : %d \n function : %s \n",user,CMD,function);
 	}
 
 	// We don't care about TX interrupt
