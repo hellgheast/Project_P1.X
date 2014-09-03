@@ -38,9 +38,9 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 //Definitions
 #define UART
 #define BUFFER_SIZE 128
-#undef DEBUG
+#define DEBUG
 
-#undef MODULE2
+#define MODULE2
 
 
 #define CREATEUSER          0
@@ -522,16 +522,19 @@ int main(int argc, char** argv)
             case INITCHAUFFAGE:
             {
                 Init_Gestion_Chauffage();
+                break;
                
             }
             case SETCHAUFFAGETEMP:
             {
                 //Fonction pour changer la consigne
-                sscanf(buffer,"%d",&p_temp);
+                sscanf(function,"%f",&p_temp);
+                break;
             }
             case GETCHAUFFAGEHISTORY:
             {
                 Get_Historique();
+                break;
             }
 
             case DISCONNECT:
