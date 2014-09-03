@@ -14,6 +14,8 @@ Modification : Version Initiale
 
 #include <peripheral/outcompare.h>
 
+#include "SPI_function.h"
+
 #ifndef PWM_H
 #define	PWM_H
 #define Kp 256 //Lorsque erreur est inférieure à 4 degrés, on chauffe à 100%, Kp doit donner 1024 lorsque l'on est à 4 degrés.
@@ -38,7 +40,6 @@ void function_ (void)
     OC1CON = OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE; // Set Timer2 as source | enable pwm mode without fault protection
     OC1CONSET = OC_ON;
 }
-
 
 void ChangePWM (int param)
 {

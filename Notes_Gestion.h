@@ -41,7 +41,7 @@ unsigned char notes_count;
 //Prototypes de fonctions
 void AddNote (char* subject,char* text,char* p_user,char* date);
 void DeleteNote (char* subject,char* p_user);
-void ReadNote (char* subject,char*user);
+void ReadNoteAll (void);
 
 void ReadPublicNotes ();
 void ReadPersonnalNotes (char* user);
@@ -221,7 +221,7 @@ void DeleteNote (char* subject,char* p_user)
     while(cnt<notes_count);
 }
 
-void ReadNote(char* subject, char* user)
+void ReadNoteAll(void)
 {
     unsigned char cnt;
     unsigned char get_buffer [256];
@@ -236,8 +236,7 @@ void ReadNote(char* subject, char* user)
       READ_cmd_n(actual_notes.nb,get_buffer,9);
       if (strcmp(get_buffer,"********")!=0)
       {
-          if(strcmp(get_buffer,subject)==0)
-          {
+
               printf("SUBJECT : %s\n",get_buffer);
 
               actual_notes.adress += 9;
@@ -253,12 +252,7 @@ void ReadNote(char* subject, char* user)
               printf("TEXTE : %s\n",get_buffer);
 
               actual_notes.adress += 129;
-          }
-          else
-          {
-            actual_notes.adress += 9+9+11+129;
-            cnt++;
-          }
+              cnt++;
       }
       else
       {

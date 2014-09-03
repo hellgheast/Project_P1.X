@@ -104,6 +104,7 @@ extern unsigned char isLogged;
 union myadress var;
 int count  = 1;
 int count2 = 1;
+int count3 = 1;
 char buffer2           [BUFFER_SIZE];
 
 //Définitions Hardware
@@ -120,6 +121,7 @@ void Init_module (void)
   SPI2Init();
   RTCCInit();
   TimerInit();
+  InitPWM();
   isLogged = 0;
 
   //Configuration des interrupts
@@ -209,6 +211,16 @@ int main(int argc, char** argv)
         {
             case 0:
             {
+              //test du rajout d'utilisateur
+              sscanf(function,"%s,%s",buffer2,password);
+              //Ecriture du compte en mémoire
+              AddUser(buffer2,password);
+              break;
+            }
+
+            case 1:
+            {
+                sscanf(function,"%s",password);
                 CheckLogin(user,password);
                 done = 0;
                 break;
@@ -257,7 +269,7 @@ int main(int argc, char** argv)
             }
 
             
-            case 6:
+            case 5:
             {
               int temp;
               //Command to check if the user have send the right pin code
@@ -266,7 +278,7 @@ int main(int argc, char** argv)
               break;
             }
 
-            case 7:
+            case 6:
             {
               int temp;
               //Pour set le code pin de la porte
@@ -274,6 +286,46 @@ int main(int argc, char** argv)
               SetDoorCode(temp);
               break;
             }
+
+            case 7:
+            {
+                //Fonction d'ajout d'une note
+                sscanf(function,"%s,%s,%s,%s",p_subject,buffer2,p_user,p_date);
+                AddNote(p_subject,buffer2,p_user,p_date);
+                break;
+            }
+
+            case 8:
+            {
+                //Fonction de suppresion d'une note
+                sscanf(function,"%s,%s",p_subject,p_user);
+                DeleteNote(p_subject,p_user);
+                break;
+            }
+
+            case 9:
+            {
+                //Fonction de lecture d'une note
+                sscanf(function,"%s,%s",p_subject,p_user);
+                ReadNoteAll();
+                break;
+            }
+
+            case 10:
+            {
+              //Fonction de lecture d'une note
+              sscanf(function,"%s",p_user);
+              ReadPersonnalNotes(p_user);
+              break;
+            }
+
+
+            case 11:
+            {
+              ReadPublicNotes();
+              break;
+            }
+
 
             case 81:
             {
@@ -284,12 +336,7 @@ int main(int argc, char** argv)
               break;
             }
 
-
-
-
-
-
-            case 10:
+            case 82:
             {
               float temp = read_kty_81_220(0); //0 pour température intérieure.
               sprintf(buffer,"la température actuelle est de %f °C",temp);
@@ -348,7 +395,6 @@ int main(int argc, char** argv)
 
             case 50:
             {
-              Init_user_gestion();
               break;
             }
 
@@ -424,37 +470,7 @@ int main(int argc, char** argv)
                 break;
             }
 
-            case 91:
-            {
-                //Fonction d'ajout d'une note
-                sscanf(function,"%s,%s,%s,%s",p_subject,buffer2,p_user,p_date);
-                AddNote(p_subject,buffer2,p_user,p_date);
-                break;
-            }
 
-            case 92:
-            {
-                //Fonction de suppresion d'une note
-                sscanf(function,"%s,%s",p_subject,p_user);
-                DeleteNote(p_subject,p_user);
-                break;
-            }
-
-            case 93:
-            {
-                //Fonction de lecture d'une note
-                sscanf(function,"%s,%s",p_subject,p_user);
-                ReadNote(p_subject,p_user);
-                break;
-            }
-
-            case 94:
-            {
-              //Fonction de lecture d'une note
-              sscanf(function,"%s",p_user);
-              ReadPersonnalNotes(p_user);
-              break;    
-            }
 
             case 230:
             {
@@ -463,47 +479,6 @@ int main(int argc, char** argv)
                 QuitCommandMode();
                 break;
             }
-
-           
-
-            #ifdef DEBUG
-            case 251:
-            {
-                //
-                var.adress = 0;
-                sscanf(function,"%d,%d",&begin_log.adress);
-                WRITE_cmd_n(var.nb,begin_log.nb,4);
-                sprintf(buffer,"%x\n",begin_log.adress);
-                putsU3(buffer);
-                break;
-            }
-
-            case 252:
-            {
-                var.adress = 0;
-                READ_cmd_n(var.nb,begin_log.nb,4);
-                sprintf (buffer,"Valeur lue : %d\n",begin_log.adress);
-                putsU3(buffer);
-                break;
-            }
-
-            case 253:
-            {
-                sscanf(function,"%d,%d",&var.adress,&begin_log.adress);
-                WRITE_cmd_n(var.nb,begin_log.nb,4);
-                break;
-            }
-
-            case 254:
-            {
-                sscanf(function,"%d",&var.adress);
-                READ_cmd_n(&var.nb[1],&begin_log.nb[1],3);
-                sprintf (buffer,"Valeur lue : %d\n",begin_log.adress);
-                putsU3(buffer);
-                break;
-            }
-
-            #endif
 
             default:
             {
@@ -570,21 +545,16 @@ void __ISR(_UART2_VECTOR, ipl4) IntUart2Handler(void)
 
             if(U2STAbits.FERR == 0 && U2STAbits.PERR == 0 )
             {
-                putU3('K');
+              //putU3('K');
               getsU3(buffer,128);   //On récupère le message
               done=1;               //On indique qu'une transmission c'est faite
             }
 
             INTEnableInterrupts();  //On réactive les interrupts
             INTClearFlag(INT_SOURCE_UART_RX(UART3A)); // Clear the RX interrupt Flag
+  
+            sscanf(buffer,"%s,%d,%s",user,&CMD,function);
 
-            #ifdef DEBUG
-              sscanf(buffer,"%d,%s",&CMD,function);
-            #endif
-
-            #ifndef DEBUG
-            sscanf(buffer," %s,%s,%d,%s",user,password,&CMD,function);
-            #endif
 	}
 
 	// We don't care about TX interrupt
@@ -601,8 +571,6 @@ void __ISR (_TIMER_1_VECTOR,ipl2) IntTimer1Handler(void)
     if(count>643)// test effectué 643 fois -> 643 fois sec = 300 sec
         //2.145 fois permet d'avoir une seconde.
     {
-
-        printf("5 minutes interrupt atteint !\n");
 
         count=1;    // reset du compteur
         mT1ClearIntFlag();
@@ -646,3 +614,4 @@ void __ISR(_TIMER_45_VECTOR,ipl2) IntTimer45Handler(void)
     }
     mT45ClearIntFlag();
 }
+

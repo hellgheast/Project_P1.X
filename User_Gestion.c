@@ -45,7 +45,7 @@ void Init_user_gestion (void)
     }
 
     //Write the user counter to zero
-    var.adress = 0x10;
+    var.adress = 0xA;
     WRITE_cmd(var.nb,0);
 }
 
@@ -56,15 +56,21 @@ void Read_log_adress (void)
 
     var.adress = 0x0;
     READ_cmd_n(var.nb,begin_log.nb,3);
-    
+   // printf("BEGIN_USER : %x\n",begin_log.adress);
+
     var.adress = 0x3;
     READ_cmd_n(var.nb,actual_log.nb,3);
-    
+    //printf("ACTUAL_USER : %x\n",actual_log.adress);
+
     var.adress = 0x6;
     READ_cmd_n(var.nb,end_log.nb,3);
+    //printf("END_USER : %x\n",end_log.adress);
 
-    var.adress = 0x10;
+    var.adress = 0xA;
     user_count = READ_cmd(var.nb);
+    //printf("USER_COUNT : %x\n",user_count);
+
+
 }
 
 void Write_log_addres (void)
@@ -81,7 +87,7 @@ void Write_log_addres (void)
     var.adress = 0x6;
     WRITE_cmd_n(var.nb,end_log.nb,3);
     
-    var.adress = 0x10;
+    var.adress = 0xA;
     WRITE_cmd(var.nb,user_count);
 
 }
@@ -227,7 +233,7 @@ int CheckLogin (char* p_user,char* p_password)
         }
     }
 
-    putsU3("User not found\n");
+    putsU3("user not found\n");
     return 0;                       //Si il n'existe pas on retourne 0
 
 
