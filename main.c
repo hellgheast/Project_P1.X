@@ -40,17 +40,17 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 #define BUFFER_SIZE 128
 #define DEBUG
 
-#define Checkuser 0
-#define Led4On 1
-#define Led4Off 2
-#define Led5On 3
-#define Led5Off 4
-#define CheckPinCode 5
-#define SetPinCode 6
-#define AddNote 7
-#define DeleteNote 8
-#define ReadNoteAll 9
-#define ReadPersonalNote 10
+#define CHECKUSER 0
+#define LED4ON 1
+#define LED4OFF 2
+#define LED5ON 3
+#define LED5OFF 4
+#define CHECKPINCODE 5
+#define SETPINCODE 6
+#define ADDNOTE 7
+#define DELETENOTE 8
+#define READALLNOTE 9
+#define READPERSONALNOTE 10
 
 //Prototypes de fonctions
 void WriteByte  (void);
@@ -244,34 +244,34 @@ int main(int argc, char** argv)
     if(done==1 && isLogged == 1){
         switch (CMD)
         {
-            case Checkuser:
+            case CHECKUSER:
             {
                 CheckLogin(user,password);
                 break;
             }
 
-            case Led4On:
+            case LED4ON:
             {
               LED4 = 1;
               putsU3("La led 4 est allumée\n\r");
               break;
             }
 
-            case Led4Off:
+            case LED4OFF:
             {
               LED4 = 0;
               putsU3("La led 4 est éteinte\n\r");
               break;
             }
 
-            case Led5On:
+            case LED5ON:
             {
               LED5 = 1;
               putsU3("La led 5 est allumée\n\r");
               break;
             }
 
-            case Led5Off:
+            case LED5OFF:
             {
               LED5 = 0;
               putsU3("La led 5 est éteinte\n\r");
@@ -279,7 +279,7 @@ int main(int argc, char** argv)
             }
 
             
-            case CheckPinCode:
+            case CHECKPINCODE:
             {
               int temp;
               //Command to check if the user have send the right pin code
@@ -288,7 +288,7 @@ int main(int argc, char** argv)
               break;
             }
 
-            case SetPinCode:
+            case SETPINCODE:
             {
               int temp;
               //Pour set le code pin de la porte
