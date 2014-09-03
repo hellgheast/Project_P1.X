@@ -51,6 +51,30 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 #define DELETENOTE 8
 #define READALLNOTE 9
 #define READPERSONALNOTE 10
+#define READPUBLICNOTE 11
+#define CHECKDOORPASSWORD 81
+#define READTEMP 82
+#define WRITEBYTE 20
+#define READBYTE 21
+#define FLOATWRITE 22
+#define FLOATREAD 23
+#define STRINGWRITE 24
+#define STRINGREAD 25
+#define CHIPERASE 26
+#define GETTIME 40
+#define GETUSERS 51
+#define READLOGADRESS 52
+#define ADDUSERS 53
+#define DELETEUSER 54
+#define MODIFYPASSWORD 55
+#define CHECKLOGIN 56
+#define MODIFYUSERNAME 57
+#define LISTINIT 70
+#define INITNOTE 90
+#define INITCHAUFFAGE 100
+#define SETCHAUFFAGETEMP 101
+#define GETCHAUFFAGEHISTORY 102
+#define DISCONNECT 230
 
 //Prototypes de fonctions
 void WriteByte  (void);
@@ -297,7 +321,7 @@ int main(int argc, char** argv)
               break;
             }
 
-            case 7:
+            case ADDNOTE:
             {
                 //Fonction d'ajout d'une note
                 sscanf(function,"%s,%s,%s,%s",p_subject,buffer2,p_user,p_date);
@@ -305,7 +329,7 @@ int main(int argc, char** argv)
                 break;
             }
 
-            case 8:
+            case DELETENOTE:
             {
                 //Fonction de suppresion d'une note
                 sscanf(function,"%s,%s",p_subject,p_user);
@@ -313,7 +337,7 @@ int main(int argc, char** argv)
                 break;
             }
 
-            case 9:
+            case READALLNOTE:
             {
                 //Fonction de lecture d'une note
                 sscanf(function,"%s,%s",p_subject,p_user);
@@ -321,7 +345,7 @@ int main(int argc, char** argv)
                 break;
             }
 
-            case 10:
+            case READPERSONALNOTE:
             {
               //Fonction de lecture d'une note
               sscanf(function,"%s",p_user);
@@ -330,14 +354,14 @@ int main(int argc, char** argv)
             }
 
 
-            case 11:
+            case READPUBLICNOTE:
             {
               ReadPublicNotes();
               break;
             }
 
 
-            case 81:
+            case CHECKDOORPASSWORD:
             {
               int temp;
               //Command to check if the user have send the right pin code
@@ -346,7 +370,7 @@ int main(int argc, char** argv)
               break;
             }
 
-            case 82:
+            case READTEMP:
             {
               float temp = read_kty_81_220(0); //0 pour température intérieure.
               sprintf(buffer,"la température actuelle est de %f °C",temp);
@@ -354,50 +378,50 @@ int main(int argc, char** argv)
               break;
             }
 
-            case 20:
+            case WRITEBYTE:
             {
               WriteByte();
               break;
             }
 
-            case 21:
+            case READBYTE:
             {
               ReadByte();
               break;
             }
 
-            case 22:
+            case FLOATWRITE:
             {
               FloatWrite();
               break;
             }
 
-            case 23:
+            case FLOATREAD:
             {
               FloatRead();
               break;
             }
 
-            case 24:
+            case STRINGWRITE:
             {
               StringWrite();
               break;
             }
 
-            case 25:
+            case STRINGREAD:
             {
               StringRead();
               break;
             }
 
-            case 26:
+            case CHIPERASE:
             {
               CE_cmd();
               putsU3("CHIP ERASED");
               break;
             }
 
-            case 40:
+            case GETTIME:
             {
               GetTime();
               break;
@@ -408,19 +432,19 @@ int main(int argc, char** argv)
               break;
             }
 
-            case 51:
+            case GETUSERS:
             {
               GetUsers();
               break;
             }
     
-            case 52:
+            case READLOGADRESS:
             {
               Read_log_adress ();
               break;
             }
 
-            case 53:
+            case ADDUSERS:
             {
               //test du rajout d'utilisateur
               sscanf(function,"%s,%s",buffer2,password);
@@ -429,7 +453,7 @@ int main(int argc, char** argv)
               break;
             }
 
-            case 54:
+            case DELETEUSER:
             {
                 //test du rajout d'utilisateur
                 sscanf(function,"%s",buffer2);
@@ -438,7 +462,7 @@ int main(int argc, char** argv)
                 break;
             }
 
-            case 55:
+            case MODIFYPASSWORD:
             {
                 //Test de la modification du mot de passe.
                 sscanf(function,"%s,%s",buffer2,buffer_s);
@@ -447,7 +471,7 @@ int main(int argc, char** argv)
                 break;
             }
 
-            case 56:
+            case CHECKLOGIN:
             {
                 //test de la vérification d'un USER
                 sscanf(function,"%s,%s",buffer2,buffer_s);
@@ -457,7 +481,7 @@ int main(int argc, char** argv)
             }
 
 
-            case 57:
+            case MODIFYUSERNAME:
             {
                 //Modification du username
                 sscanf(function,"%s,%s",buffer2,buffer_s);
@@ -466,34 +490,34 @@ int main(int argc, char** argv)
                 break;
             }
 
-            case 70:
+            case LISTINIT:
             {
                 ListInit();
                 break;
             }
 
 
-            case 90:
+            case INITNOTE:
             {
                 //Initialisation
                 InitNote();
                 break;
             }
-            case 100:
+            case INITCHAUFFAGE:
             {
                 Init_Gestion_Chauffage();
                
             }
-            case 101:
+            case SETCHAUFFAGETEMP:
             {
                 gestion_chauffage(22); //La température demandée est une constante pour l'instant.
             }
-            case 102:
+            case GETCHAUFFAGEHISTORY:
             {
                 Get_Historique();
             }
 
-            case 230:
+            case DISCONNECT:
             {
                 SetCommandMode();
                 Disconnect();
