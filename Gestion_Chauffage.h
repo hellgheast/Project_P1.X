@@ -20,7 +20,7 @@ Modification : Version Initiale
 
 #ifndef PWM_H
 #define	PWM_H
-#define Kp 256 //Lorsque erreur est inférieure à 4 degrés, on chauffe à 100%, Kp doit donner 1024 lorsque l'on est à 4 degrés.
+#define Kp 256 
 
 void Regulation (void);
 void InitPWM (void);
@@ -114,7 +114,7 @@ void Add_temperature(void)
     int_temp.f = read_kty_81_220(0);
     ext_temp.f = read_kty_81_220(2);
 
-    for(i.adress=end_temperature.adress;i.adress>actual_temperature.adress;i.adress=i.adress-8) // Décalage des valeurs sur la droite
+    for(i.adress=end_temperature.adress;i.adress>actual_temperature.adress;i.adress=i.adress-8) // We add the temperature at the begin of the list and we shift to the right the other
     {
         a.adress=i.adress-8;
         READ_cmd_n(a.nb,buffer,8);
@@ -125,18 +125,18 @@ void Add_temperature(void)
 
     WRITE_cmd_n(actual_temperature.nb,ext_temp.nb,4);
 
-    if(end_temperature.adress<0x4e6) //0x4e6 = derniere adresse de la plage
+    if(end_temperature.adress<0x4e6) //0x4e6 the last memory position for the temperature
     {
     end_temperature.adress+=8;
     }
     else
     {
-        // Fin du plage mémoire
+        // We are arrived at the end of the memmory we allowed for the heating
     }
 }
 void Get_Historique(void)
 {
-    //Pour l'instant affichage avec des printf
+    //Printing the history 
     char date[3];
     char heure[3];
     char temp[4];
@@ -191,19 +191,22 @@ void gestion_chauffage(float consigne_temp)
     //ext_temp = read_kty_81_220(2);
     //lum = read_TL250();
 
+    //ancien code 
     //float erreur = (consigne_temp-lum/200.0) - int_temp; //calcul de l'erreur et diminution de la consigne selon la luminosité
-    float erreur=consigne_temp-int_temp;
-    if(erreur > 4.0)
+    float erreur=consigne_temp+0.5-int_temp;
+    if(erreur > 1.0)
     {
         chauffage = 1024;
     }
     else
     {
         chauffage= Kp*erreur;
+
+        // Ancien code
         //chauffage = Kp * erreur + (int_temp-ext_temp)*10; //régulation p et prise en compte de la température extérieure.
     }
-
-    if(chauffage <= 1024 && chauffage >=0) //test de sécurité pour éviter les problèmes.
+    
+    if(chauffage <= 1024 && chauffage >=0) //Security test to avoid problems
     {
         ChangePWM (chauffage);
     }
