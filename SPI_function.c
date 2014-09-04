@@ -1,7 +1,7 @@
 #include "SPI_function.h"
 #include "Bluetooth_Module.h"
 
-//Fichier source des commandes SPI pour l'EEPROM 25LC1024
+//Source file of commands SPI for the EEPROM 25LC1024
 
 #define READ  0b00000011  //3
 #define WRITE 0b00000010  //2
@@ -16,8 +16,8 @@
 #define DPD   0b10111001  //
 
 
-/*Code Source*/
-/*Fonction de configuration du bus SPI sur le PIC*/
+/*Source code*/
+/*Configuration function of the SPI bus on the PIC*/
 void SetSPICONFIG(int chn,int isMaster,int taille_byte)
 {
    TRISE = 0x00;
@@ -47,7 +47,7 @@ void SetSPICONFIG(int chn,int isMaster,int taille_byte)
          config=config|SPI_CONFIG_MSTEN;
        }
 
-       SpiChnOpen(chn,config,16);//Division de la fréquence par 16
+       SpiChnOpen(chn,config,16);//Division of the frequency by 16
 
    }
 }
@@ -56,7 +56,7 @@ void SPI2Init(void)
 {
     TRISCbits.TRISC3 = 0;
 
-    // On indique que les bits 0 à 3 du port E sont des sorties
+    // We indicate that bits 0 to 3 from the E port are outputs
     TRISEbits.TRISE0 = 0;
     TRISEbits.TRISE1 = 0;
     TRISEbits.TRISE2 = 0;
@@ -65,19 +65,19 @@ void SPI2Init(void)
     SPI2CONbits.ON		= 0;	// disable SPI port
     SPI2CONbits.SIDL 	        = 0; 	// Continue module operation in Idle mode
     SPI2BUF                     = 0;   	// clear SPI buffer
-    SPI2CONbits.MODE16          = 0;    //Mode 16 bits inactif
-    SPI2CONbits.MODE32          = 0;    //Mode 32 bits inactif
+    SPI2CONbits.MODE16          = 0;    //Mode 16 bits inactive
+    SPI2CONbits.MODE32          = 0;    //Mode 32 bits inactive
 
     SPI2CONbits.DISSDO		= 0;	// SDOx pin is controlled by the module
     SPI2CONbits.MODE16          = 0;	// set in 8-bit mode, clear in 16-bit mode
     SPI2CONbits.SMP		= 1;	// Input data sampled at middle of data output time,dans notre cas end of time
-    SPI2CONbits.CKP 		= 0;	// On indique que IDLE est 0 et ACTIVE est 1
-    SPI2CONbits.CKE 		= 1;	// Le changement de la donnée se fait au flanc descdant
+    SPI2CONbits.CKP 		= 0;	// We indicate that IDLE is 0 and ACTIVE is 1
+    SPI2CONbits.CKE 		= 1;	// The change of the data is made at the falling edge.
     SPI2CONbits.MSTEN 		= 1; 	// 1 =  Master mode; 0 =  Slave mode
 
     SPI2CONbits.FRMEN		= 0;	// non-framed mode
 
-        SPI2BRG = 16;                        //Il s'agit du diviseur de fréquence Fsck = Fpb / 2* (SPIxBRG+1)
+        SPI2BRG = 16;                        //It's the frequency divisor Fsck = Fpb / 2* (SPIxBRG+1)
 
     SPI2CONbits.ON 		= 1; 	// enable SPI port, clear status
 
@@ -109,7 +109,7 @@ void SpiInitDevice(SpiChannel chn, int isMaster, int frmEn, int frmMaster)
 
 
 
-//Fonctions de commande de l'EEPROM
+//Command function of the l'EEPROM
 
 unsigned char writeSPI2( unsigned char data )
 {
@@ -213,18 +213,18 @@ unsigned char RDID_cmd (unsigned char addr_tab[])
 
 void WRITE_cmd(unsigned char addr_tab[],unsigned char byte)
 {
-    while(RDSR_cmd() & 0x1) ; // On vérifie si l'EEPROM est en cours de fonctionnement
+    while(RDSR_cmd() & 0x1) ; // We check if the l'EEPROM is running
 
-    /*Autorisation d'écriture*/
+    /*Writing permission*/
     WREN_cmd();
 
     CS = 0;
     writeSPI2(WRITE);
-    /*Envoi de l'adresse*/
+    /*adress sending*/
     writeSPI2(addr_tab[2]);
     writeSPI2(addr_tab[1]);
     writeSPI2(addr_tab[0]);
-    /*Envoi du byte*/
+    /*byte sending*/
     writeSPI2(byte);
     CS = 1;
 }
@@ -232,12 +232,12 @@ void WRITE_cmd(unsigned char addr_tab[],unsigned char byte)
 unsigned char READ_cmd (unsigned char addr_tab[])
 {
     int value;
-    while(RDSR_cmd() & 0x1);  // On vérifie si l'EEPROM est en cours de fonctionnement
+    while(RDSR_cmd() & 0x1);  // We check if the l'EEPROM is running
 
     CS = 0;
-    /*Envoi de la commande*/
+    /*Command sending*/
     writeSPI2(READ);
-    /*Envoi de l'adresse*/
+    /*Address sending*/
     writeSPI2(addr_tab[2]);
     writeSPI2(addr_tab[1]);
     writeSPI2(addr_tab[0]);
@@ -256,15 +256,15 @@ void WRITE_cmd_32(unsigned char addr_tab[], int data) { // write a 32-bit value 
     writeSPI2(WRITE); // write command
 
 
-    //Envoi des valeurs en little-endian
+    //Sending values on little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
     writeSPI2(addr_tab[1]); // address LSB (word aligned)
     writeSPI2(addr_tab[0]); // address MSB first
 
-    writeSPI2(data >> 24);  // Envoi du MSB
-    writeSPI2(data >> 16);  // Envoi du 2ème byte
-    writeSPI2(data >> 8);   // Envoi du 3ème byte
-    writeSPI2(data);        // Envoi du LSB
+    writeSPI2(data >> 24);  // sending MSB
+    writeSPI2(data >> 16);  // sending second byte
+    writeSPI2(data >> 8);   // sending third byte
+    writeSPI2(data);        // sending LSB
     CS = 1;
 }// writeSEE
 
@@ -278,7 +278,7 @@ unsigned int READ_cmd_32(unsigned char addr_tab[])
     CS = 0; // select the Serial EEPROM
     writeSPI2(READ); // read command
 
-    //Envoi des valeurs en little-endian
+    //Sending values on little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
     writeSPI2(addr_tab[1]); // address LSB (word aligned)
     writeSPI2(addr_tab[0]); // address MSB first
@@ -302,7 +302,7 @@ void WRITE_cmd_n (unsigned char addr_tab[],unsigned char data[],unsigned int n)
     CS = 0; // select the Serial EEPROM
     writeSPI2(WRITE); // write command
     
-    //Envoi des valeurs en little-endian
+    //Sending values on little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
     writeSPI2(addr_tab[1]); // address LSB (word aligned)
     writeSPI2(addr_tab[0]); // address MSB first
@@ -325,7 +325,7 @@ void READ_cmd_n(unsigned char addr_tab[],unsigned char data[],unsigned int n)
     CS = 0; // select the Serial EEPROM
     writeSPI2(READ); // read command
 
-    //Envoi des valeurs en little-endian
+    //Sending values on little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
     writeSPI2(addr_tab[1]); // address LSB (word aligned)
     writeSPI2(addr_tab[0]); // address MSB first
@@ -351,7 +351,7 @@ int READ_string(unsigned char addr_tab[],unsigned char* data,unsigned int n)
     CS = 0; // select the Serial EEPROM
     writeSPI2(READ); // read command
 
-    //Envoi des valeurs en little-endian
+    //Sending values on little-endian
     writeSPI2(addr_tab[2]); // address LSB (word aligned)
     writeSPI2(addr_tab[1]); // address LSB (word aligned)
     writeSPI2(addr_tab[0]); // address MSB first
@@ -359,7 +359,7 @@ int READ_string(unsigned char addr_tab[],unsigned char* data,unsigned int n)
    for(i=0;i<n;i++)
    {
        data[i]=writeSPI2(0);
-       //Cette condition détecte la fin d'une chaîne de caractère
+       //Tis condition detect the end of a chain of character
        if(data[i]=='\0')
        {
            break;
