@@ -60,6 +60,7 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 #define ADD_SCHEDULING      14
 #define DELETE_SCHEDULING   15
 #define SETTEMPCONSIGN      16
+#define ACTIVEBUZZER        17
 
 
 
@@ -93,6 +94,8 @@ Modification : Fonctionnement de l'écriture de flottant sur la mémoire
 #define SETCHAUFFAGETEMP    101
 #define GETCHAUFFAGEHISTORY 102
 #define ADDCHAUFFAGETEMP    103
+
+#define INIT_SYSTEM         200
 #define DISCONNECT          236
 
 //Prototypes de fonctions
@@ -161,9 +164,6 @@ int count2 = 1;
 int count3 = 1;
 char buffer2           [BUFFER_SIZE];
 
-//Définitions Hardware
-#define LED5 PORTCbits.RC1
-#define LED4 PORTAbits.RA3
 
 
 
@@ -185,15 +185,15 @@ void Init_module (void)
 
 
   //Configure Timer 1 Interrupt
-  ConfigIntTimer1(T1_INT_ON | T1_INT_PRIOR_2);
+  //ConfigIntTimer1(T1_INT_ON | T1_INT_PRIOR_2);
 
   //Configure Timer 45 Interrupt
   //ConfigIntTimer45(T45_INT_ON | T45_INT_PRIOR_3);
 
   //configure interrupt capteur de mouvement.
-  mINT0SetIntPriority(1); //On set la priorité de l'interrupt du capteur de mouvement.
-  mINT0IntEnable(0); //On s'assure que l'interrupt du capteur de mouvement est désactivée au démarrage.
-  INTCONbits.INT0EP = 1; // L'interrupt du capteur de mouvement s'activera lors des fronts montants uniquement.
+  // mINT0SetIntPriority(1); //On set la priorité de l'interrupt du capteur de mouvement.
+  // mINT0IntEnable(0); //On s'assure que l'interrupt du capteur de mouvement est désactivée au démarrage.
+  // INTCONbits.INT0EP = 1; // L'interrupt du capteur de mouvement s'activera lors des fronts montants uniquement.
 
   // Enable multi-vector interrupts
   INTConfigureSystem(INT_SYSTEM_CONFIG_MULT_VECTOR);
@@ -542,6 +542,24 @@ int main(int argc, char** argv)
             case GETCHAUFFAGEHISTORY:
             {
                 Get_Historique();
+                break;
+            }
+
+            case ACTIVEBUZZER:
+            {
+                int i;
+                SetDCOC4PWM(1023);
+                for(i=0;i<0xffff;i++);
+                SetDCOC4PWM(0);
+                break;
+            }
+
+
+            case INIT_SYSTEM:
+            {
+                Init_user_gestion();
+                InitNote();
+                Init_Gestion_Chauffage();
                 break;
             }
 

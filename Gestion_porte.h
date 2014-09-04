@@ -66,10 +66,12 @@ int  OpenDoor(int code)
     if (DoorCheck == 1)
     {
         printf("%s DOOR OPEN",user);
+        LED4 = 1;
     }
     else
     {
         printf("%s DOOR NOT OPEN",user);
+        LED4 = 0;
     }
 }
 

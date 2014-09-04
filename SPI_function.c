@@ -293,7 +293,7 @@ unsigned int READ_cmd_32(unsigned char addr_tab[])
 
 void WRITE_cmd_n (unsigned char addr_tab[],unsigned char data[],unsigned int n)
 {
-    char i;
+    char i=0;
     while (RDSR_cmd() & 0x1){} // check the WIP flag
 
      WREN_cmd();

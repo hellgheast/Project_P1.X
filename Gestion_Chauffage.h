@@ -43,6 +43,11 @@ void InitPWM()
     OpenTimer2( T2_ON | T2_PS_1_2 | T2_SOURCE_INT, 1024);
     OpenOC3( OC_ON | OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE, 0, 0);
     SetDCOC3PWM(512);
+
+    CloseOC4();
+    OpenOC4( OC_ON | OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE, 0, 0);
+    SetDCOC4PWM(0);
+
 }
 
 void Init_Gestion_Chauffage(void)

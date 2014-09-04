@@ -123,14 +123,15 @@ int  AddUser    (char* p_user,char* p_password)
         if(strcmp(buffer,"********")==0)
         {
     
-            WRITE_cmd_n(actual_log.nb,p_user,strlen(user)+1);
+            WRITE_cmd_n(actual_log.nb,p_user,9);
             actual_log.adress +=9;
 
-            WRITE_cmd_n(actual_log.nb,p_password,strlen(password)+1);
-            actual_log.adress+=strlen(password)+1;
+            WRITE_cmd_n(actual_log.nb,p_password,9);
+            actual_log.adress+=9;
             cnt = 13;
             user_count++;
             Write_log_addres();
+            putsU3("USER CREATED");
             return 1;
 
         }
@@ -203,7 +204,7 @@ int CheckLogin (char* p_user,char* p_password)
     Read_log_adress();
     
     printf("USER : %s\n",p_user);
-
+    printf("BEG : %d ACT : %d END : %d\n",begin_log.adress,actual_log.adress,end_log.adress);
 
     for(actual_log.adress = begin_log.adress,cnt=0;cnt<user_count;actual_log.adress += 18,cnt++ )
     {

@@ -111,6 +111,11 @@ unsigned char isAdmin;
 unsigned char isLogged;
 
 
+//Définitions Hardware
+#define LED5 PORTCbits.RC1
+#define LED4 PORTAbits.RA3
+
+
 
 
 #endif	/* GENERAL_FUNC_H */
