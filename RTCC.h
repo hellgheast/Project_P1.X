@@ -20,9 +20,9 @@ Modification : Ajout du lock
 void RTCCInit(void);
 void RTCCLock(void);
 
-/*Fonctions*/
+/*Functions*/
 
-//Fonction d'initialisation
+//Initialize the RTCC
 void RTCCInit(void)
 {
 
@@ -56,7 +56,7 @@ void RTCCInit(void)
 
 void RTCCLock (void)
 {
-    INTDisableInterrupts(); //On désactive les interrupts le temps de la configuration
+    INTDisableInterrupts(); //Disable the interrupts to configure the clock
 
     SYSKEY = 0xaa996655; // write first unlock key to SYSKEY
     SYSKEY = 0x556699aa; // write second unlock key to SYSKEY

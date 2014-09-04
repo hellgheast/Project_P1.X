@@ -19,11 +19,11 @@ Modification : Implémentation des fonctions d'effacement
 
 
 
-//Définitions Hardware
+//Hardware definitions
 #define CS_FLASH PORTEbits.RE3
 #define CS_FLASH_IO TRISEbits.TRISE3
 
-//Liste des commandes disponibles
+//List of the available command
 #define REMS        0x90    //Read Electronic Manufacturer Signature
 #define RDID        0x9F    //Read ID (JEDEC Manufacturer ID and JEDEC CFI)
 #define RES         0xAB    //Read Electronic Signature
@@ -87,7 +87,7 @@ Modification : Implémentation des fonctions d'effacement
 #define OTPP        0x42    //OTP Program
 #define OTPR        0x4B    //OTP Read
 
-//Gestion de Secteur Mémoire Avancée
+//Advanced sector management
 #define DYBRD       0xE0    //DYB Read
 #define DYBWE       0xE1    //DYB Write
 #define PPBRD       0XE2    //PPB Read
@@ -105,7 +105,7 @@ Modification : Implémentation des fonctions d'effacement
 #define RESET       0xF0    //Software Reset
 #define MBR         0xFF    //Mode Bit Reset
 
-//Fonctions
+//Functions
 void InitFlash (void);
 void Write_Enable(void);
 unsigned char RDSR1_cmd (void);

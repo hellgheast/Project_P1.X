@@ -22,43 +22,43 @@ Modification : Version initiale
 //Typedefs
 typedef unsigned LBA;
 
-//Commandes pour carte SD
+//Command for the SD card
 #define RESET           0   //a.k.a GO_IDLE (CMD0)
 #define INIT            1   //a.k.a SEND_OP_CMD (CMD1)
 #define READ_SINGLE     17
 #define WRITE_SINGLE    24
 
-//definitions de macros
+//Macros definitions
 #define clockSPI()  writeSPI2(0xFF);
 #define readSPI()   writeSPI2(0xFF);
 #define disableSD() SD_CS = 1; clockSPI()
 #define enableSD()  SD_CS = 0
 
-//Définitions HardWare
+//Hardware definition
 #define SD_CS PORTGbits.RG15
 #define SD_IO TRISGbits.TRISG15
 
-//Définitions d'erreur
+//Error definition
 #define E_COMMAND_ACK   0x80
 #define E_INIT_TIMEOUT  0x81
 #define FAIL FALSE
 
-//definitions pour les fonctions
+//Function definition
 #define I_TIMEOUT       100000 //100 ms
 #define R_TIMEOUT       1000   //1   ms
 #define W_TIMEOUT       100000 //100 ms
-//Définitions SD
+//SD definition
 #define DATA_START  0xFE
 #define DATA_ACCEPT 0x05
 
-//Prototypes de fonctions
+//Prototypes
 void InitSD(void);
 int sendSDCmd (unsigned char cmd,unsigned address);
 int initMedia(void);
 int readSECTOR (LBA ,char *);
 int writeSECTOR (LBA ,char *);
 
-//Fonctions
+//Functions
 void InitSD (void)
 {
     SD_IO = 0;
@@ -87,11 +87,11 @@ void InitSD (void)
 
 int sendSDCmd (unsigned char cmd,unsigned address)
 {
-    //Variables locales
+    //Local variable
     char i;
     int reponse;
 
-    writeSPI2(cmd | 0x40);//Envoi de la commande
+    writeSPI2(cmd | 0x40);//Send command
 
     writeSPI2(address>>24);//MSB de l'adresse
     writeSPI2(address>>16);
@@ -109,10 +109,10 @@ int sendSDCmd (unsigned char cmd,unsigned address)
     return reponse;
 
 
-    //la carte SD est toujours active !
+    //SD card is always activated
 }
 
-//Fonction d'initialisation de la carte SD
+//Initialize SD cards
 int initMedia(void)
 {
     int i,reponse;

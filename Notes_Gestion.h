@@ -30,15 +30,15 @@ typedef struct
 }mynote;
 
 
-//Variables externes
+//Extern variable
 extern union myadress begin_notes;
 extern union myadress actual_notes;
 extern union myadress end_notes;
 
-//Variables globales
+//Global variable
 unsigned char notes_count;
 
-//Prototypes de fonctions
+////Prototypes
 void AddNote (char* subject,char* text,char* p_user,char* date);
 void DeleteNote (char* subject,char* p_user);
 void ReadNoteAll (void);
@@ -50,7 +50,7 @@ void Read_notes_pointer(void);
 void Write_notes_pointer(void);
 void InitNote (void);
 
-//Fonction d'initialisation pour les notes.
+//Initialize the note
 void InitNote (void)
 {
     union myadress temp;
@@ -78,7 +78,7 @@ void InitNote (void)
 
 }
 
-//Fonction de lecture des adresses des pointeurs
+//Read the pointer's adress
 void Read_notes_pointer(void)
 {
   union myadress temp;
@@ -102,7 +102,7 @@ void Read_notes_pointer(void)
   printf("NOTES COUNT: %u \n",notes_count);
 }
 
-//Fonction d'écriture des adresses des pointeurs en mémoire
+//Write the pointer's adress in memory
 void Write_notes_pointer(void)
 {
     union myadress temp;
@@ -121,7 +121,7 @@ void Write_notes_pointer(void)
 }
 
 
-//Fonction d'ajout
+//Add note
 void AddNote (char* subject,char* text,char* p_user,char* date)
 {
     mynote NotetoSend;
@@ -129,7 +129,7 @@ void AddNote (char* subject,char* text,char* p_user,char* date)
     char ERASER [9]="********";
     int get_free=0;
 
-    //Copie des données dans la structure
+    //Copy the data in the structure
     strcpy(NotetoSend.Subject,subject);
     strcpy(NotetoSend.User,p_user);
     strcpy(NotetoSend.Date,date);
@@ -137,13 +137,13 @@ void AddNote (char* subject,char* text,char* p_user,char* date)
 
 
 
-    //Lecture des pointeurs et des informations concernant les notes
+    //Read pointers and informations about the notes
     Read_notes_pointer();
 
-    //On commence par le débt de la chaine
+    //Start at the beginning of the chain
     actual_notes.adress = begin_notes.adress;
 
-    //Boucle afin d'écrire dans un emplacement libre
+    //Loop to write in a free memory space
     do
     {
       READ_cmd_n(actual_notes.nb,get_buffer,9);
@@ -159,7 +159,7 @@ void AddNote (char* subject,char* text,char* p_user,char* date)
     while (get_free==0);
 
 
-    //Ecriture en memoire de la note.
+    //Write the note in the memory
     WRITE_cmd_n(actual_notes.nb,NotetoSend.Subject,9);
     actual_notes.adress += 9;
 
@@ -227,10 +227,10 @@ void ReadNoteAll(void)
 {
     unsigned char cnt;
     unsigned char get_buffer [256];
-    //Lecture des pointeurs et des informations concernant les notes
+    //Read pointers and informations about the notes
     Read_notes_pointer();
 
-    //On commence par le débt de la chaine
+    //Start at the beginning of the chain
     actual_notes.adress = begin_notes.adress;
 
     for (cnt=0;cnt<notes_count;)
@@ -264,17 +264,17 @@ void ReadNoteAll(void)
 
 }
 
-//Fonction pour lire les notes personelles
+//Read the personnal note
 void ReadPersonnalNotes(char* user)
 {
     unsigned char cnt;
     unsigned char get_subject [9];
     unsigned char get_buffer [256];
 
-    //Lecture des pointeurs et des informations concernant les notes
+    //Read pointers and informations about the notes
     Read_notes_pointer();
 
-    //On commence par le débt de la chaine
+    //Start at the beginning of the chain
     actual_notes.adress = begin_notes.adress;
 
     for (cnt=0;cnt<notes_count;cnt++)
@@ -316,17 +316,17 @@ void ReadPersonnalNotes(char* user)
 
 }
 
-//Fonction pour lire les notes personelles
+//Read the public note
 void ReadPublicNotes(void)
 {
     unsigned char cnt;
     unsigned char get_subject [9];
     unsigned char get_buffer [256];
 
-    //Lecture des pointeurs et des informations concernant les notes
+    //Read pointers and informations about the notes
     Read_notes_pointer();
 
-    //On commence par le débt de la chaine
+        //Start at the beginning of the chain
     actual_notes.adress = begin_notes.adress;
 
     for (cnt=0;cnt<notes_count;cnt++)
